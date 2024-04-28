@@ -5,8 +5,8 @@ def catalog_view(request,**kwargs):
   
   return render(request,'blog/catalog.html')
 
-def category_view(request,pid):
+def category_view(request):
   return render(request,'blog/category.html')
 
-def details_view(request,pid):
+def details_view(request):
   return render(request,'blog/details.html')
