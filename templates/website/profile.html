@@ -13,7 +13,7 @@
 
 				<div class="col-12 col-xl-6">
 					<ul class="breadcrumb">
-						<li class="breadcrumb__item"><a href="index.html">Home</a></li>
+						<li class="breadcrumb__item"><a href="{%url 'website:index'%}">Home</a></li>
 						<li class="breadcrumb__item breadcrumb__item--active">Profile</li>
 					</ul>
 				</div>
@@ -33,8 +33,8 @@
 								<img src="{% static 'img/avatar.svg' %}" alt="">
 							</div>
 							<div class="profile__meta">
-								<h3>John Doe</h3>
-								<span>FlixTV ID: 11104</span>
+								<h3>{{request.user.username}}</h3>
+								
 							</div>
 						</div>
 
@@ -55,8 +55,10 @@
 						<!-- end tabs nav -->
 
 						<button class="profile__logout" type="button">
-							<span>Sign out</span>
-							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4,12a1,1,0,0,0,1,1h7.59l-2.3,2.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0l4-4a1,1,0,0,0,.21-.33,1,1,0,0,0,0-.76,1,1,0,0,0-.21-.33l-4-4a1,1,0,1,0-1.42,1.42L12.59,11H5A1,1,0,0,0,4,12ZM17,2H7A3,3,0,0,0,4,5V8A1,1,0,0,0,6,8V5A1,1,0,0,1,7,4H17a1,1,0,0,1,1,1V19a1,1,0,0,1-1,1H7a1,1,0,0,1-1-1V16a1,1,0,0,0-2,0v3a3,3,0,0,0,3,3H17a3,3,0,0,0,3-3V5A3,3,0,0,0,17,2Z"></path></svg>
+							<a href="{% url 'accounts:logout'%}" class="header__user" style="font-size: 12px;">
+								<span>Sign Out</span>
+								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20,12a1,1,0,0,0-1-1H11.41l2.3-2.29a1,1,0,1,0-1.42-1.42l-4,4a1,1,0,0,0-.21.33,1,1,0,0,0,0,.76,1,1,0,0,0,.21.33l4,4a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42L11.41,13H19A1,1,0,0,0,20,12ZM17,2H7A3,3,0,0,0,4,5V19a3,3,0,0,0,3,3H17a3,3,0,0,0,3-3V16a1,1,0,0,0-2,0v3a1,1,0,0,1-1,1H7a1,1,0,0,1-1-1V5A1,1,0,0,1,7,4H17a1,1,0,0,1,1,1V8a1,1,0,0,0,2,0V5A3,3,0,0,0,17,2Z"/></svg>
+							</a>
 						</button>
 					</div>
 				</div>
