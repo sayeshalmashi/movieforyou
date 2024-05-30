@@ -4,5 +4,6 @@ app_name='blog'
 
 urlpatterns = [
   path('',movies_view,name='index'),
-  path('details',details_view,name='details'),
+  path('<int:pid>',details_view,name='details'),
+  path('author/<str:author_username>',movies_view,name='author'),
 ]
