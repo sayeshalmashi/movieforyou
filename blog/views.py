@@ -23,3 +23,9 @@ def details_view(request,pid):
   # movie.save()
   context={'movie':movie}
   return render(request,'blog/details.html',context)
+
+
+# def blog_category(request,cat_name):
+#   movies=Movie.objects.filter(status=1,category__name=cat_name)
+#   context={'movies':movies}
+#   return render(request,'blog/movies.html',context)
