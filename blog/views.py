@@ -29,3 +29,12 @@ def details_view(request,pid):
 #   movies=Movie.objects.filter(status=1,category__name=cat_name)
 #   context={'movies':movies}
 #   return render(request,'blog/movies.html',context)
+
+def blog_search(request):
+  current_time=timezone.now()
+  movies=Movie.objects.filter(status=1,published_date__lte=current_time).order_by('-id')
+  if request.method=='GET':
+    if s:= request.GET.get('s'): # agar request.GET.get('s') ro rikhte toye s
+      movies=movies.filter(title__contains=s)
+  context={'movies':movies}
+  return render(request,'blog/movies.html',context)
