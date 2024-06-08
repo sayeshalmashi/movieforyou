@@ -1,6 +1,7 @@
 from django.shortcuts import render,get_object_or_404
 from django.utils import timezone
 from blog.models import Movie
+from django.core.paginator import Paginator , EmptyPage,PageNotAnInteger
 
 def movies_view(request,**kwargs):
   current_time=timezone.now()
@@ -10,6 +11,16 @@ def movies_view(request,**kwargs):
   if kwargs.get('author_username')!=None:
     movies=movies.filter(status=1,author__username=kwargs['author_username'])
   
+  movies=Paginator(movies,6)
+  try:
+    page_number=request.GET.get('page')
+    movies=movies.get_page(page_number)
+  except PageNotAnInteger:
+    # return render(request,'path-to-your-404-template.html')
+    movies=movies.get_page(1)
+  except EmptyPage:
+    movies=movies.get_page(1)
+    
   context={'movies':movies}
   return render(request,'blog/movies.html',context)
 
