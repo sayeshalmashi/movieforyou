@@ -23,6 +23,8 @@ urlpatterns = [
     path('',include('website.urls')),
     path('movie/', include('blog.urls')),
     path('accounts/',include('accounts.urls')),
+    
+    path('captcha/', include('captcha.urls')),
 ]
 
 

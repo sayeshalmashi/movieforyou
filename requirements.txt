@@ -3,3 +3,5 @@ asgiref
 pytz
 sqlparse
 pillow
+django-simple-captcha
+captcha
