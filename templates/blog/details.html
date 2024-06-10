@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {%load static%}
+{%load humanize%}
 {% block content %}
 	<!-- details -->
 	<section class="section section--head section--head-fixed section--gradient section--details-bg">
@@ -25,7 +26,7 @@
 								{%for cat in movie.category.all %}
 								<li>{{cat.name}}</li>
 								{%endfor%}
-								<li>{{movie.released_date|date:"d M Y"}}</li>
+								<li>{{movie.released_date|naturaltime}}</li>
 								<!-- <li>1 h 42 min</li>
 								<li>16+</li> -->
 							</ul>
@@ -67,6 +68,39 @@
 						</div>
 					</div>
 					<!-- end video player -->
+
+					<div class="col-12 col-xl-8">
+						<div class="row">
+							{% if prev_post %}
+							<div class="col-lg-6 col-md-6 col-12 nav-left flex-row d-flex justify-content-start align-items-center">
+								<div class="thumb">
+									<a href="{% url 'blog:details' prev_post.id %}"><img class="img-fluid" src="{{prev_post.image.url}}" alt=""></a>
+								</div>
+								<div class="arrow">
+									<a href="{% url 'blog:details' prev_post.id %}"><span class="lnr text-white lnr-arrow-left"></span></a>
+								</div>
+								<div class="detials">
+									<p>Prev Post</p>
+									<a href="{% url 'blog:details' prev_post.id %}"><h4>{{prev_post.title}}</h4></a>
+								</div>
+							</div>
+							{%endif%}
+							{%if next_post%}
+							<div class="col-lg-6 col-md-6 col-12 nav-right flex-row d-flex justify-content-end align-items-center">
+								<div class="detials">
+									<p>Next Post</p>
+									<a href="{% url 'blog:details' next_post.id %}"><h4>{{next_post.title}}</h4></a>
+								</div>
+								<div class="arrow">
+									<a href="{% url 'blog:details' next_post.id %}"><span class="lnr text-white lnr-arrow-right"></span></a>
+								</div>
+								<div class="thumb">
+									<a href="{% url 'blog:details' next_post.id %}"><img class="img-fluid" src="{{next_post.image.url}}" alt=""></a>
+								</div>										
+							</div>
+							{%endif%}								
+						</div>
+					</div>
 
 					<!-- series -->
 					<div class="col-12">

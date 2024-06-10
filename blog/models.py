@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 # Create your models here.
 class Category(models.Model):
@@ -10,6 +11,7 @@ class Category(models.Model):
 class Movie(models.Model):
   title=models.CharField(max_length=255)
   content=models.TextField()
+  image=models.ImageField(upload_to='blog/',default='blog/default.jpg')
   rate=models.IntegerField()
   category=models.ManyToManyField(Category)
   status=models.BooleanField(default=False)
@@ -24,6 +26,8 @@ class Movie(models.Model):
     
   def __str__(self):
    return "{}-{}".format(self.title,self.id)
+  def get_absolute_url(self):
+   return reverse('blog:details',kwargs={'pid':self.id})
  
 class Comment(models.Model):
   movie=models.ForeignKey(Movie,on_delete=models.CASCADE)

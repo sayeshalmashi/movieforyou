@@ -40,15 +40,15 @@ def details_view(request,pid):
   current_time=timezone.now()
   movies=Movie.objects.filter(status=1,published_date__lte=current_time)
   movie=get_object_or_404(movies,pk=pid)
-  # prev_post=Movie.objects.filter(pk__lt=movie.id,status=1,published_date__lte=current_time).order_by('-pk').first()
-  # next_post=Movie.objects.filter(pk__gt=movie.id,status=1,published_date__lte=current_time).order_by('pk').first()
-  # # post.count_views+=1
-  # movie.save()
+  prev_post=Movie.objects.filter(pk__lt=movie.id,status=1,published_date__lte=current_time).order_by('-pk').first()
+  next_post=Movie.objects.filter(pk__gt=movie.id,status=1,published_date__lte=current_time).order_by('pk').first()
+  # post.count_views+=1
+  movie.save()
   if request.user.is_authenticated:
     movie.login_require=True
     comments=Comment.objects.filter(movie=movie.id,approved=True)
     form=CommentForm() 
-    context={'movie':movie,'comments':comments,'form':form}
+    context={'movie':movie,'comments':comments,'form':form,'prev_post':prev_post,'next_post':next_post,}
     return render(request,'blog/details.html',context)
   else:
     next_url=reverse('blog:details',kwargs={'pid':movie.id})

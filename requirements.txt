@@ -1,7 +1,10 @@
-Django>3.2,<3.3
+Django==5.0.6
 asgiref
 pytz
 sqlparse
 pillow
 django-simple-captcha
 captcha
+django-multi-captcha-admin
+django-robots
+django-debug-toolbar
