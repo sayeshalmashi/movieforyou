@@ -42,7 +42,7 @@ def details_view(request,pid):
   movie=get_object_or_404(movies,pk=pid)
   prev_post=Movie.objects.filter(pk__lt=movie.id,status=1,published_date__lte=current_time).order_by('-pk').first()
   next_post=Movie.objects.filter(pk__gt=movie.id,status=1,published_date__lte=current_time).order_by('pk').first()
-  # post.count_views+=1
+  movie.count_views+=1
   movie.save()
   if request.user.is_authenticated:
     movie.login_require=True

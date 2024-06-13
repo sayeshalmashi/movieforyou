@@ -58,7 +58,7 @@
 				</h6>
 					<div class="sign__content">
 						<!-- authorization form -->
-						<form action="{%url 'accounts:login'%}" method="post" class="sign__form">
+						<form action="{%url 'accounts:login' %}" method="post" class="sign__form">
 							{%csrf_token%}
 							<a href="{%url 'website:index'%}" class="sign__logo">
 								<img src="{% static 'img/logo.svg' %}" alt="">

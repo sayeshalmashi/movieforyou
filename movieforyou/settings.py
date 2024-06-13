@@ -43,12 +43,31 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'debug_toolbar',
     'robots',
-    
+    'compressor',
     'captcha',
     'website',
     'blog',
     'accounts', 
 ]
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    # other finders..
+    'compressor.finders.CompressorFinder',
+]
+
+
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = True
+COMPRESS_CSS_FILTERS = [
+    'compressor.filters.css_default.CssAbsoluteFilter',
+    'compressor.filters.cssmin.CSSMinFilter',
+]
+COMPRESS_JS_FILTERS = [
+    'compressor.filters.jsmin.JSMinFilter',
+]
+
 
 # site framework
 SITE_ID = 2

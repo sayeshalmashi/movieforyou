@@ -43,3 +43,8 @@ urlpatterns = [
 
 urlpatterns+=static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns+=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler400 = "movieforyou.error_views.error_400"
+handler403 = "movieforyou.error_views.error_403"
+handler404 = "movieforyou.error_views.error_404"
+handler500 = "movieforyou.error_views.error_500"

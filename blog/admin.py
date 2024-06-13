@@ -5,7 +5,7 @@ from blog.models import Movie , Category ,Comment
 class MovieAdmin(admin.ModelAdmin):
   date_hierarchy='create_date'
   empty_value_display='-empty-'
-  list_display=('title','status','author','published_date','create_date','released_date','login_require',)
+  list_display=('title','status','count_views','author','published_date','create_date','released_date','login_require',)
   list_filter=('status',) #topple akharesh ,
   ordering=['-create_date']
   search_fields=['title','content']

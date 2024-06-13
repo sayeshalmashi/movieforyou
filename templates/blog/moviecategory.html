@@ -1,4 +1,5 @@
 {%load static%}
+{%load compress%}
 <select class="catalog__select" name="genres" onchange="location=this.value;">
   <option value="Select genres">Select genres</option>
   <option value="{%url 'blog:index'%}">All genres</option>

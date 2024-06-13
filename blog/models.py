@@ -15,6 +15,7 @@ class Movie(models.Model):
   rate=models.IntegerField()
   category=models.ManyToManyField(Category)
   status=models.BooleanField(default=False)
+  count_views=models.IntegerField(default=0)
   published_date=models.DateTimeField(null=True)
   create_date=models.DateTimeField(auto_now_add=True)
   update_date=models.DateTimeField(auto_now=True)
