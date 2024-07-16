@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {%load static%}
+{%load compress%}
+{%load humanize%}
 {% block content %}
 	<!-- details -->
 	<section class="section section--head section--head-fixed section--gradient section--details-bg">
@@ -18,24 +20,27 @@
 
 						<!-- article content -->
 						<div class="article__content">
-							<h1>The Fast and the Furious</h1>
+							<h1>{{movie.title}}</h1>
 
 							<ul class="list">
-								<li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22,9.67A1,1,0,0,0,21.14,9l-5.69-.83L12.9,3a1,1,0,0,0-1.8,0L8.55,8.16,2.86,9a1,1,0,0,0-.81.68,1,1,0,0,0,.25,1l4.13,4-1,5.68A1,1,0,0,0,6.9,21.44L12,18.77l5.1,2.67a.93.93,0,0,0,.46.12,1,1,0,0,0,.59-.19,1,1,0,0,0,.4-1l-1-5.68,4.13-4A1,1,0,0,0,22,9.67Zm-6.15,4a1,1,0,0,0-.29.88l.72,4.2-3.76-2a1.06,1.06,0,0,0-.94,0l-3.76,2,.72-4.2a1,1,0,0,0-.29-.88l-3-3,4.21-.61a1,1,0,0,0,.76-.55L12,5.7l1.88,3.82a1,1,0,0,0,.76.55l4.21.61Z"/></svg> 9.7</li>
-								<li>Action</li>
-								<li>2021</li>
-								<li>1 h 42 min</li>
-								<li>16+</li>
+								<li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22,9.67A1,1,0,0,0,21.14,9l-5.69-.83L12.9,3a1,1,0,0,0-1.8,0L8.55,8.16,2.86,9a1,1,0,0,0-.81.68,1,1,0,0,0,.25,1l4.13,4-1,5.68A1,1,0,0,0,6.9,21.44L12,18.77l5.1,2.67a.93.93,0,0,0,.46.12,1,1,0,0,0,.59-.19,1,1,0,0,0,.4-1l-1-5.68,4.13-4A1,1,0,0,0,22,9.67Zm-6.15,4a1,1,0,0,0-.29.88l.72,4.2-3.76-2a1.06,1.06,0,0,0-.94,0l-3.76,2,.72-4.2a1,1,0,0,0-.29-.88l-3-3,4.21-.61a1,1,0,0,0,.76-.55L12,5.7l1.88,3.82a1,1,0,0,0,.76.55l4.21.61Z"/></svg>{{movie.rate}}</li>
+								{%for cat in movie.category.all %}
+								<li>{{cat.name}}</li>
+								{%endfor%}
+								<li>{{movie.released_date|naturaltime}}</li>
+								<!-- <li>1 h 42 min</li>
+								<li>16+</li> -->
+								<li>{{movie.count_views}} views</li>
 							</ul>
 
-							<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.</p>
+							<p>{{movie.content}}</p>
 						</div>
 						<!-- end article content -->
 					</div>
 
 					<!-- video player -->
 					<div class="col-12 col-xl-8">
-						<video controls crossorigin playsinline poster="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg' %}" id="player">
+						<video controls crossorigin playsinline poster="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg" id="player">
 							<!-- Video files -->
 							<source src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4" type="video/mp4" size="576">
 							<source src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-720p.mp4" type="video/mp4" size="720">
@@ -65,6 +70,39 @@
 						</div>
 					</div>
 					<!-- end video player -->
+
+					<div class="col-12 col-xl-8">
+						<div class="row">
+							{% if prev_post %}
+							<div class="col-lg-6 col-md-6 col-12 nav-left flex-row d-flex justify-content-start align-items-center">
+								<div class="thumb" style="width: 20%; height: 50%;">
+									<a href="{% url 'blog:details' prev_post.id %}"><img style="width: 100%; height: 100%;" class="img-fluid" src="{{prev_post.image.url}}" alt=""></a>
+								</div>
+								<div class="arrow">
+									<a href="{% url 'blog:details' prev_post.id %}"><span class="lnr text-white lnr-arrow-left"></span></a>
+								</div>
+								<div class="detials" style="margin: 5%; font-size: 0.8rem;">
+									<p style="color: aliceblue;">Prev Post</p>
+									<a href="{% url 'blog:details' prev_post.id %}"><h4>{{prev_post.title}}</h4></a>
+								</div>
+							</div>
+							{%endif%}
+							{%if next_post%}
+							<div class="col-lg-6 col-md-6 col-12 nav-right flex-row d-flex justify-content-end align-items-center">
+								<div class="detials" style="margin: 5%; font-size: 0.8rem;">
+									<p style="color: aliceblue;">Next Post</p>
+									<a href="{% url 'blog:details' next_post.id %}"><h4>{{next_post.title}}</h4></a>
+								</div>
+								<div class="arrow">
+									<a href="{% url 'blog:details' next_post.id %}"><span class="lnr text-white lnr-arrow-right"></span></a>
+								</div>
+								<div class="thumb" style="width: 20%; height: 50%;">
+									<a href="{% url 'blog:details' next_post.id %}"><img style="width: 100%; height: 100%;" class="img-fluid" src="{{next_post.image.url}}" alt=""></a>
+								</div>										
+							</div>
+							{%endif%}								
+						</div>
+					</div>
 
 					<!-- series -->
 					<div class="col-12">
@@ -144,9 +182,9 @@
 						<!-- categories -->
 						<div class="categories">
 							<h3 class="categories__title">Genres</h3>
-							<a href="category.html" class="categories__item">Action</a>
-							<a href="category.html" class="categories__item">Thriller</a>
-							<a href="category.html" class="categories__item">Crime</a>
+						  	{%for cat in movie.category.all %}
+								<a href="category.html" class="categories__item">{{cat.name}}</a>
+								{%endfor%}
 						</div>
 						<!-- end categories -->
 
@@ -170,16 +208,17 @@
 								<li class="nav-item">
 									<a class="nav-link active" data-toggle="tab" href="#tab-1" role="tab" aria-controls="tab-1" aria-selected="true">
 										<h4>Comments</h4>
-										<span>5</span>
+									
+										<span>{{comments|length}}</span>
 									</a>
 								</li>
 
-								<li class="nav-item">
+								<!-- <li class="nav-item">
 									<a class="nav-link" data-toggle="tab" href="#tab-2" role="tab" aria-controls="tab-2" aria-selected="false">
 										<h4>Reviews</h4>
 										<span>3</span>
 									</a>
-								</li>
+								</li> -->
 							</ul>
 							<!-- end tabs nav -->
 
@@ -188,13 +227,14 @@
 								<!-- comments -->
 								<div class="tab-pane fade show active" id="tab-1" role="tabpanel">
 									<ul class="comments__list">
+										{%for comment in comments %}
 										<li class="comments__item">
 											<div class="comments__autor">
 												<img class="comments__avatar" src="{% static 'img/avatar.svg' %}" alt="">
-												<span class="comments__name">Brian Cranston</span>
-												<span class="comments__time">30.08.2021, 17:53</span>
+												<span class="comments__name">{{comment.name}}</span>
+												<span class="comments__time">{{comment.created_date|date:"d M Y"}}</span>
 											</div>
-											<p class="comments__text">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.</p>
+											<p class="comments__text">{{comment.message}}</p>
 											<div class="comments__actions">
 												<div class="comments__rate">
 													<button type="button"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 7.3273V14.6537" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M14.6667 10.9905H7.33333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M15.6857 1H6.31429C3.04762 1 1 3.31208 1 6.58516V15.4148C1 18.6879 3.0381 21 6.31429 21H15.6857C18.9619 21 21 18.6879 21 15.4148V6.58516C21 3.31208 18.9619 1 15.6857 1Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg> 12</button>
@@ -206,8 +246,12 @@
 												<button type="button"><svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'><polyline points='320 120 368 168 320 216' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/><path d='M352,168H144a80.24,80.24,0,0,0-80,80v16' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/><polyline points='192 392 144 344 192 296' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/><path d='M160,344H368a80.24,80.24,0,0,0,80-80V248' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/></svg><span>Quote</span></button>
 											</div>
 										</li>
-
-										<li class="comments__item comments__item--answer">
+										{% empty %}
+								     <div class="comment-form" style="color: aliceblue;">
+									     <h4>No comments here, be the first one to tell your thoughts!</h4>
+							    	</div>
+										{%endfor%}
+										<!-- <li class="comments__item comments__item--answer">
 											<div class="comments__autor">
 												<img class="comments__avatar" src="{% static 'img/avatar.svg' %}" alt="">
 												<span class="comments__name">Jesse Plemons</span>
@@ -243,48 +287,11 @@
 												<button type="button"><svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'><polyline points='400 160 464 224 400 288' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/><path d='M448,224H154C95.24,224,48,273.33,48,332v20' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/></svg><span>Reply</span></button>
 												<button type="button"><svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'><polyline points='320 120 368 168 320 216' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/><path d='M352,168H144a80.24,80.24,0,0,0-80,80v16' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/><polyline points='192 392 144 344 192 296' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/><path d='M160,344H368a80.24,80.24,0,0,0,80-80V248' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/></svg><span>Quote</span></button>
 											</div>
-										</li>
+										</li> -->
 
-										<li class="comments__item">
-											<div class="comments__autor">
-												<img class="comments__avatar" src="{% static 'img/avatar.svg' %}" alt="">
-												<span class="comments__name">Tess Harper</span>
-												<span class="comments__time">07.08.2021, 14:33</span>
-											</div>
-											<p class="comments__text">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.</p>
-											<div class="comments__actions">
-												<div class="comments__rate">
-													<button type="button"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 7.3273V14.6537" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M14.6667 10.9905H7.33333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M15.6857 1H6.31429C3.04762 1 1 3.31208 1 6.58516V15.4148C1 18.6879 3.0381 21 6.31429 21H15.6857C18.9619 21 21 18.6879 21 15.4148V6.58516C21 3.31208 18.9619 1 15.6857 1Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg> 7</button>
-
-													<button type="button">4 <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.6667 10.9905H7.33333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M15.6857 1H6.31429C3.04762 1 1 3.31208 1 6.58516V15.4148C1 18.6879 3.0381 21 6.31429 21H15.6857C18.9619 21 21 18.6879 21 15.4148V6.58516C21 3.31208 18.9619 1 15.6857 1Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
-												</div>
-
-												<button type="button"><svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'><polyline points='400 160 464 224 400 288' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/><path d='M448,224H154C95.24,224,48,273.33,48,332v20' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/></svg><span>Reply</span></button>
-												<button type="button"><svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'><polyline points='320 120 368 168 320 216' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/><path d='M352,168H144a80.24,80.24,0,0,0-80,80v16' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/><polyline points='192 392 144 344 192 296' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/><path d='M160,344H368a80.24,80.24,0,0,0,80-80V248' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/></svg><span>Quote</span></button>
-											</div>
-										</li>
-
-										<li class="comments__item">
-											<div class="comments__autor">
-												<img class="comments__avatar" src="{% static 'img/avatar.svg' %}" alt="">
-												<span class="comments__name">Jonathan Banks</span>
-												<span class="comments__time">02.08.2021, 15:24</span>
-											</div>
-											<p class="comments__text">Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
-											<div class="comments__actions">
-												<div class="comments__rate">
-													<button type="button"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 7.3273V14.6537" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M14.6667 10.9905H7.33333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M15.6857 1H6.31429C3.04762 1 1 3.31208 1 6.58516V15.4148C1 18.6879 3.0381 21 6.31429 21H15.6857C18.9619 21 21 18.6879 21 15.4148V6.58516C21 3.31208 18.9619 1 15.6857 1Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg> 2</button>
-
-													<button type="button">17 <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.6667 10.9905H7.33333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M15.6857 1H6.31429C3.04762 1 1 3.31208 1 6.58516V15.4148C1 18.6879 3.0381 21 6.31429 21H15.6857C18.9619 21 21 18.6879 21 15.4148V6.58516C21 3.31208 18.9619 1 15.6857 1Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
-												</div>
-
-												<button type="button"><svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'><polyline points='400 160 464 224 400 288' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/><path d='M448,224H154C95.24,224,48,273.33,48,332v20' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/></svg><span>Reply</span></button>
-												<button type="button"><svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'><polyline points='320 120 368 168 320 216' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/><path d='M352,168H144a80.24,80.24,0,0,0-80,80v16' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/><polyline points='192 392 144 344 192 296' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/><path d='M160,344H368a80.24,80.24,0,0,0,80-80V248' style='fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px'/></svg><span>Quote</span></button>
-											</div>
-										</li>
 									</ul>
 
-									<div class="catalog__paginator-wrap catalog__paginator-wrap--comments">
+									<!-- <div class="catalog__paginator-wrap catalog__paginator-wrap--comments">
 										<span class="catalog__pages">5 from 16</span>
 
 										<ul class="catalog__paginator">
@@ -303,19 +310,43 @@
 												</a>
 											</li>
 										</ul>
-									</div>
+									</div> -->
 
-									<form action="#" class="comments__form">
-										<div class="sign__group">
-											<textarea id="text" name="text" class="sign__textarea" placeholder="Add comment"></textarea>
+									<form action="{%url 'blog:details' pid=movie.id %}" method="post" class="comments__form">
+										{%csrf_token%}
+										<input type="hidden" name="movie" value="{{movie.id}}">
+										<div class="col-12 col-xl-6">
+											<div class="sign__group">
+												<input type="text" name="name" class="sign__input" placeholder="Name">
+											</div>
 										</div>
-										<button type="button" class="sign__btn">Send</button>
+			
+										<div class="col-12 col-xl-6">
+											<div class="sign__group">
+												<input type="email" name="email" class="sign__input" placeholder="Email">
+											</div>
+										</div>
+										<div class="col-12 col-xl-6">
+											<div class="sign__group">
+												<input type="text" name="subject" class="sign__input" placeholder="subject">
+											</div>
+										</div>
+			
+
+										<div class="col-12">
+											<div class="sign__group">
+												<textarea id="text" name="message" class="sign__textarea" placeholder="Add comment"></textarea>
+											</div>
+										</div>
+									
+
+										<button type="submit" class="sign__btn">Send</button>
 									</form>
 								</div>
 								<!-- end comments -->
 
 								<!-- reviews -->
-								<div class="tab-pane fade" id="tab-2" role="tabpanel">
+								<!-- <div class="tab-pane fade" id="tab-2" role="tabpanel">
 									<ul class="reviews__list">
 										<li class="reviews__item">
 											<div class="reviews__autor">
@@ -385,7 +416,7 @@
 											</div>
 										</div>
 									</form>
-								</div>
+								</div> -->
 								<!-- end reviews -->
 							</div>
 							<!-- end tabs -->		
@@ -414,7 +445,7 @@
 							<!-- end subscribe -->
 
 							<!-- new items -->
-							<div class="row row--grid">
+							<!-- <div class="row row--grid">
 								<div class="col-12">
 									<h5 class="sidebar__title">New items</h5>
 								</div>
@@ -486,7 +517,7 @@
 										</ul>
 									</div>
 								</div>
-							</div>
+							</div> -->
 							<!-- end new items -->
 						</div>
 					</div>

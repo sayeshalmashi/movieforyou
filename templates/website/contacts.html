@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {%load static%}
+{%load compress%}
 {% block content %}
 	<!-- head -->
 	<section class="section section--head section--head-fixed">
@@ -25,7 +26,8 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-12 col-lg-7 col-xl-8">
-					<form action="#" class="sign__form sign__form--contacts">
+					<form action="{%url 'website:contact' %}" method="post" class="sign__form sign__form--contacts">
+						{%csrf_token%}
 						<div class="row">
 							<div class="col-12 col-xl-6">
 								<div class="sign__group">
@@ -35,7 +37,7 @@
 
 							<div class="col-12 col-xl-6">
 								<div class="sign__group">
-									<input type="text" name="email" class="sign__input" placeholder="Email">
+									<input type="email" name="email" class="sign__input" placeholder="Email">
 								</div>
 							</div>
 
@@ -47,12 +49,13 @@
 
 							<div class="col-12">
 								<div class="sign__group">
-									<textarea name="text" class="sign__textarea" placeholder="Type your message"></textarea>
+									<textarea name="message" class="sign__textarea" placeholder="Type your message"></textarea>
 								</div>
 							</div>
 
 							<div class="col-12 col-xl-3">
-								<button type="button" class="sign__btn">Send</button>
+								<div class="pb-7">{{form.captcha}}</div>
+								<button type="submit" class="sign__btn">Send</button>
 							</div>
 						</div>
 					</form>	
