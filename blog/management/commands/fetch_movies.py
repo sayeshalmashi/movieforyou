@@ -26,13 +26,12 @@ def fetch_and_save_movies():
                     'content': movie['overview'],
                     'rate': movie['vote_average'],
                     'published_date': movie['release_date'],
-                    'image': movie['poster_path'], # باید از یک URL کامل استفاده کنید
-                    'status': True,  # مثلا فیلم‌هایی که در TMDB موجود هستند
-                    'login_require': False  # مثلا برای همه کاربران نمایش داده شود
+                    'image': movie['poster_path'],
+                    'status': True,  
+                    'login_require': False 
                 }
             )
             if created:
-                # اضافه کردن ژانرها به فیلم
                 genre_ids = movie.get('genre_ids', [])
                 for genre_id in genre_ids:
                     genre = Category.objects.filter(id=genre_id).first()
