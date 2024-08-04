@@ -16,10 +16,10 @@ def fetch_movies(api_key, page=1):
     print(f"API Response Status Code: {response.status_code}")
     if response.status_code == 200:
         data = response.json()
-        print(f"API Response Data: {data}")  # چاپ داده‌های دریافت‌شده
+        print(f"API Response Data: {data}") 
         return data['results']
     else:
-        print(f"API Request Failed: {response.text}")  # چاپ خطای احتمالی
+        print(f"API Request Failed: {response.text}") 
         return None
 
 def save_movies_to_db(api_key):
@@ -39,19 +39,18 @@ def save_movies_to_db(api_key):
                         'content': movie_data.get('overview', ''),
                         'rate': movie_data.get('vote_average', 0),
                         'image': f"https://image.tmdb.org/t/p/w500{movie_data.get('poster_path', '')}",
-                        'status': not movie_data.get('adult', False),  # تغییر وضعیت به طور معکوس
+                        'status': not movie_data.get('adult', False),  
                         'published_date': movie_data.get('release_date', None),
                         'released_date': movie_data.get('release_date', None),
                         'create_date': timezone.now(),
                     }
                 )
 
-                # اضافه کردن دسته‌بندی‌ها به فیلم
                 movie.category.set(categories)
                 movie.save()
-                print(f"Movie '{movie.title}' saved successfully.")  # چاپ پیام موفقیت
+                print(f"Movie '{movie.title}' saved successfully.") 
             except Exception as e:
-                print(f"Error saving movie '{movie_data['title']}': {str(e)}")  # چاپ پیام خطا
+                print(f"Error saving movie '{movie_data['title']}': {str(e)}") 
 
 
 # Define movies_view function
@@ -134,7 +133,7 @@ def blog_search(request):
 # Define a new view for updating movies from TMDB
 @login_required
 def update_movies(request):
-    api_key = '5903757e800fec82004573c343c707d5'  # Replace with your actual TMDB API key
+    api_key = '5903757e800fec82004573c343c707d5'
     save_movies_to_db(api_key)
     messages.success(request, "Movies updated successfully from TMDB.")
-    return redirect('blog:movies_view')
+    return render(request, 'blog/movies.html')
