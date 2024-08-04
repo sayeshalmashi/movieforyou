@@ -10,14 +10,14 @@ import requests
 
 TMDB_API_KEY='5903757e800fec82004573c343c707d5'
 # Define fetch_movies function
-def fetch_movies(api_key, page=1):
-    url = f'https://api.themoviedb.org/3/movie/popular?api_key={api_key}&language=en-US&page={page}'
-    response = requests.get(url)
+def fetch_movies():
+    url = f'https://api.themoviedb.org/3/movie/popular?api_key={TMDB_API_KEY}&language=en-US'
+    response = requests.get(url,verify=False)
     print(f"API Response Status Code: {response.status_code}")
     if response.status_code == 200:
         data = response.json()
-        print(f"API Response Data: {data}") 
-        return data['results']
+        for item in data.get('results',[]):
+            save_movies_to_db(item)
     else:
         print(f"API Request Failed: {response.text}") 
         return None
@@ -129,11 +129,3 @@ def blog_search(request):
     
     context = {'movies': movies}
     return render(request, 'blog/movies.html', context)
-
-# Define a new view for updating movies from TMDB
-@login_required
-def update_movies(request):
-    api_key = '5903757e800fec82004573c343c707d5'
-    save_movies_to_db(api_key)
-    messages.success(request, "Movies updated successfully from TMDB.")
-    return render(request, 'blog/movies.html')
