@@ -1,24 +1,29 @@
-from django.contrib import admin
-from blog.models import Movie , Category ,Comment
-# Register your models here.
+from django.db import models
+from django.contrib.auth.models import User
+from django.urls import reverse
 
-class MovieAdmin(admin.ModelAdmin):
-  date_hierarchy='create_date'
-  empty_value_display='-empty-'
-  list_display=('title','status','count_views','author','published_date','create_date','released_date','login_require',)
-  list_filter=('status',) #topple akharesh ,
-  ordering=['-create_date']
-  search_fields=['title','content']
+# Create your models here.
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+    tmdb_id = models.IntegerField(unique=True, null=True, blank=True)  
 
+    def __str__(self):
+        return self.name
 
-class CommentAdmin(admin.ModelAdmin):
-  date_hierarchy='created_date'
-  empty_value_display='-empty-'
-  list_display=('name','movie','approved','created_date')
-  list_filter=('movie','approved',) #topple akharesh ,
-  ordering=['-created_date']
-  search_fields=['name','movie']
+class Movie(models.Model):
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    image = models.ImageField(upload_to='blog/', default='blog/default.jpg')
+    rate = models.FloatField()  # تغییر به Float برای دقت بیشتر
+    category = models.ManyToManyField(Category)
+    status = models.BooleanField(default=False)
+    count_views = models.IntegerField(default=0)
+    published_date = models.DateTimeField(null=True)
+    create_date = models.DateTimeField(auto_now_add=True)
+    update_date = models.DateTimeField(auto_now=True)
+    released_date = models.DateTimeField(null=True)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    login_require = models.BooleanField(default=False)
 
-admin.site.register(Comment,CommentAdmin)
-admin.site.register(Movie,MovieAdmin)
-admin.site.register(Category)
+    class Meta:
+        ordering = ['-create_date']
