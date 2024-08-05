@@ -7,23 +7,25 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import requests
+import urllib3 
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 TMDB_API_KEY='5903757e800fec82004573c343c707d5'
 # Define fetch_movies function
 def fetch_movies():
     url = f'https://api.themoviedb.org/3/movie/popular?api_key={TMDB_API_KEY}&language=en-US'
-    response = requests.get(url,verify=False)
+    response = requests.get(url)
     print(f"API Response Status Code: {response.status_code}")
     if response.status_code == 200:
         data = response.json()
-        for item in data.get('results',[]):
-            save_movies_to_db(item)
+        return data.get('results', [])
     else:
-        print(f"API Request Failed: {response.text}") 
+        print(f"API Request Failed: {response.text}")
         return None
 
-def save_movies_to_db(api_key):
-    movies_data = fetch_movies(api_key)
+
+def save_movies_to_db():
+    movies_data = fetch_movies()  # Removed api_key argument
     if movies_data:
         for movie_data in movies_data:
             try:
@@ -48,9 +50,9 @@ def save_movies_to_db(api_key):
 
                 movie.category.set(categories)
                 movie.save()
-                print(f"Movie '{movie.title}' saved successfully.") 
+                print(f"Movie '{movie.title}' saved successfully.")
             except Exception as e:
-                print(f"Error saving movie '{movie_data['title']}': {str(e)}") 
+                print(f"Error saving movie '{movie_data['title']}': {str(e)}")
 
 
 # Define movies_view function
