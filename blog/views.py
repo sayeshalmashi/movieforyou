@@ -18,6 +18,7 @@ def fetch_movies():
     print(f"API Response Status Code: {response.status_code}")
     if response.status_code == 200:
         data = response.json()
+        print(data)
         return data.get('results', [])
     else:
         print(f"API Request Failed: {response.text}")
@@ -53,6 +54,7 @@ def save_movies_to_db():
                 print(f"Movie '{movie.title}' saved successfully.")
             except Exception as e:
                 print(f"Error saving movie '{movie_data['title']}': {str(e)}")
+                raise
 
 
 # Define movies_view function
