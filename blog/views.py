@@ -7,68 +7,108 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import requests
+from datetime import datetime
 import urllib3 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-TMDB_API_KEY='5903757e800fec82004573c343c707d5'
-# Define fetch_movies function
-def fetch_movies():
-    url = f'https://api.themoviedb.org/3/movie/popular?api_key={TMDB_API_KEY}&language=en-US'
-    response = requests.get(url)
-    print(f"API Response Status Code: {response.status_code}")
-    if response.status_code == 200:
+API_KEY = '5903757e800fec82004573c343c707d5'
+BASE_URL = 'https://api.themoviedb.org/3'
+def fetch_and_save_movies():
+    total_movies = 0
+    page = 1
+
+    while total_movies < 800:
+        # Define the endpoint and parameters
+        url = f'{BASE_URL}/movie/popular?api_key={API_KEY}&language=en-US&page={page}'
+
+        # Make the request
+        response = requests.get(url)
+        if response.status_code != 200:
+            print(f'Error fetching data: {response.status_code}')
+            return
+
         data = response.json()
-        print(data)
-        return data.get('results', [])
-    else:
-        print(f"API Request Failed: {response.text}")
-        return None
+        movies = data.get('results', [])
 
+        if not movies:
+            break
 
-def save_movies_to_db():
-    movies_data = fetch_movies()  # Removed api_key argument
-    if movies_data:
-        for movie_data in movies_data:
-            try:
-                genre_ids = movie_data.get('genre_ids', [])
-                categories = []
-                for genre_id in genre_ids:
-                    category, created = Category.objects.get_or_create(id=genre_id)
-                    categories.append(category)
+        for movie_data in movies:
+            release_date = movie_data.get('release_date')
+            if release_date:
+                release_date = datetime.strptime(release_date, '%Y-%m-%d')
+            else:
+                release_date = None
 
-                movie, created = Movie.objects.get_or_create(
-                    title=movie_data['title'],
-                    defaults={
-                        'content': movie_data.get('overview', ''),
-                        'rate': movie_data.get('vote_average', 0),
-                        'image': f"https://image.tmdb.org/t/p/w500{movie_data.get('poster_path', '')}",
-                        'status': not movie_data.get('adult', False),  
-                        'published_date': movie_data.get('release_date', None),
-                        'released_date': movie_data.get('release_date', None),
-                        'create_date': timezone.now(),
-                    }
+            # Get or create movie
+            movie, created = Movie.objects.get_or_create(
+                movie_id=movie_data['id'],
+                defaults={
+                    'adult': movie_data['adult'],
+                    'backdrop_path': movie_data.get('backdrop_path'),
+                    'original_language': movie_data['original_language'],
+                    'original_title': movie_data['original_title'],
+                    'overview': movie_data['overview'],
+                    'popularity': movie_data['popularity'],
+                    'poster_path': movie_data.get('poster_path'),
+                    'release_date': release_date,
+                    'title': movie_data['title'],
+                    'video': movie_data['video'],
+                    'vote_average': movie_data['vote_average'],
+                    'vote_count': movie_data['vote_count'],
+                }
+            )
+
+            # Process genres
+            genre_ids = movie_data['genre_ids']
+            for genre_id in genre_ids:
+                genre_data = fetch_genre_by_id(genre_id)
+                genre, _ = Category.objects.get_or_create(
+                    genre_id=genre_data['id'],
+                    defaults={'name': genre_data['name']}
                 )
+                movie.genres.add(genre)
 
-                movie.category.set(categories)
-                movie.save()
-                print(f"Movie '{movie.title}' saved successfully.")
-            except Exception as e:
-                print(f"Error saving movie '{movie_data['title']}': {str(e)}")
-                raise
+            movie.save()
+
+        total_movies += len(movies)
+        page += 1
+
+def fetch_genre_by_id(genre_id):
+    # Define the endpoint and parameters
+    url = f'{BASE_URL}/genre/movie/list'
+    params = {
+        'api_key': API_KEY,
+        'language': 'en-US'
+    }
+
+    # Make the request
+    response = requests.get(url, params=params)
+    if response.status_code != 200:
+        print(f'Error fetching genre data: {response.status_code}')
+        return {}
+
+    genres = response.json().get('genres', [])
+    for genre in genres:
+        if genre['id'] == genre_id:
+            return genre
+
+    return {}
+
 
 
 # Define movies_view function
 def movies_view(request, **kwargs):
     current_time = timezone.now()
-    movies = Movie.objects.filter(status=True, published_date__lte=current_time).order_by('-id')
+    movies = Movie.objects.filter(status=True, release_date__lte=current_time).order_by('-movie_id')
     
     # Filter movies by category name
     if 'cat_name' in kwargs:
         movies = movies.filter(category__name__iexact=kwargs['cat_name'])
         
-    # Filter movies by author username
-    if 'author_username' in kwargs:
-        movies = movies.filter(author__username__iexact=kwargs['author_username'])
+    # # Filter movies by author username
+    # if 'author_username' in kwargs:
+    #     movies = movies.filter(author__username__iexact=kwargs['author_username'])
     
     # Pagination
     paginator = Paginator(movies, 6)
@@ -86,15 +126,12 @@ def movies_view(request, **kwargs):
 # Define details_view function
 def details_view(request, pid):
     current_time = timezone.now()
-    movie = get_object_or_404(Movie, pk=pid, status=True, published_date__lte=current_time)
+    movie = get_object_or_404(Movie, pk=pid, status=True)
     
-    # Increment view count
-    movie.count_views += 1
-    movie.save()
 
     # Fetch previous and next movies
-    prev_post = Movie.objects.filter(pk__lt=movie.id, status=True, published_date__lte=current_time).order_by('-pk').first()
-    next_post = Movie.objects.filter(pk__gt=movie.id, status=True, published_date__lte=current_time).order_by('pk').first()
+    prev_post = Movie.objects.filter(pk__lt=movie.id, status=True, release_date__lte=current_time).order_by('-pk').first()
+    next_post = Movie.objects.filter(pk__gt=movie.id, status=True, release_date__lte=current_time).order_by('pk').first()
     
     if request.user.is_authenticated:
         comments = Comment.objects.filter(movie=movie, approved=True)
@@ -125,7 +162,7 @@ def details_view(request, pid):
 # Define blog_search function
 def blog_search(request):
     current_time = timezone.now()
-    movies = Movie.objects.filter(status=True, published_date__lte=current_time).order_by('-id')
+    movies = Movie.objects.filter(status=True, release_date__lte=current_time).order_by('-movie_id')
     
     if 's' in request.GET:
         s = request.GET.get('s')

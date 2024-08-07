@@ -3,12 +3,12 @@ from blog.models import Movie , Category ,Comment
 # Register your models here.
 
 class MovieAdmin(admin.ModelAdmin):
-  date_hierarchy='create_date'
+  date_hierarchy='release_date'
   empty_value_display='-empty-'
-  list_display=('title','status','count_views','author','published_date','create_date','released_date','login_require',)
-  list_filter=('status',) #topple akharesh ,
-  ordering=['-create_date']
-  search_fields=['title','content']
+  list_display=('title','vote_count','release_date','login_require',)
+  list_filter=('release_date',) #topple akharesh ,
+  ordering=['-release_date']
+  search_fields=['title','overview']
 
 
 class CommentAdmin(admin.ModelAdmin):

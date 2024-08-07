@@ -1,11 +1,15 @@
-{%load static%}
-{%load compress%}
-<select class="catalog__select" name="genres" onchange="location=this.value;">
-  <option value="Select genres">Select genres</option>
-  <option value="{%url 'blog:index'%}">All genres</option>
-  {% for name,count in categories.items %}
-  <option value="{% url 'blog:category' cat_name=name %}">
-    {{name}} / {{count}}
-  </option>
-  {%endfor%}
-</select>
+{% load static %}
+{% load compress %}
+
+<form method="get" action="{% url 'blog:movies_view' %}">
+    {% csrf_token %}
+    <select class="catalog__select" name="genres" onchange="this.form.submit();">
+        <option value="">Select genres</option>
+        <option value="{% url 'blog:index' %}">All genres</option>
+        {% for name, count in categories.items %}
+        <option value="{% url 'blog:category' cat_name=name %}">
+            {{ name }} / {{ count }}
+        </option>
+        {% endfor %}
+    </select>
+</form>

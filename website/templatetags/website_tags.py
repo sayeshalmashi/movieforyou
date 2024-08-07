@@ -7,14 +7,13 @@ register = template.Library()
 @register.inclusion_tag('website/latestmovie.html')
 def latestmovie(arg=8):
   current_time=timezone.now()
-  movies=Movie.objects.filter(status=1,published_date__lte=current_time).order_by('-released_date')[:arg]
+  movies=Movie.objects.filter(status=1).order_by('-release_date')[:arg]
   return {'movies':movies}
 
 
 @register.inclusion_tag('blog/moviecategory.html')
 def postcategory():
-  current_time=timezone.now()
-  movies=Movie.objects.filter(status=1,published_date__lte=current_time)
+  movies=Movie.objects.filter(status=1)
   categories=Category.objects.all()
   cat_dict={}
   for name in categories:
