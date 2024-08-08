@@ -5481,3 +5481,20 @@ body::-webkit-scrollbar-thumb {
 .plyr--video .plyr__control svg {
   filter: none;
 }
+.rating {
+  display: flex;
+  direction: row;
+  font-size: 2rem;
+  color: gold;
+  cursor: pointer;
+}
+
+.star {
+  margin-right: 5px;
+  color: grey;
+}
+
+.star:hover,
+.star.selected {
+  color: orange;
+}

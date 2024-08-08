@@ -1,18 +1,22 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
-from blog.models import Movie, Comment, Category
+from blog.models import Movie, Comment, Category , Rating
 from blog.forms import CommentForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 import requests
+from django.db.models import Count
 from datetime import datetime
 import urllib3 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 API_KEY = '5903757e800fec82004573c343c707d5'
 BASE_URL = 'https://api.themoviedb.org/3'
+
 def fetch_and_save_movies():
     total_movies = 0
     page = 1
@@ -69,10 +73,38 @@ def fetch_and_save_movies():
                 )
                 movie.genres.add(genre)
 
+            # Fetch and save the trailer
+            trailer_url = fetch_trailer_url(movie_data['id'])
+            if trailer_url:
+                movie.trailer_url = trailer_url
+
             movie.save()
 
         total_movies += len(movies)
         page += 1
+
+def fetch_trailer_url(movie_id):
+    # Define the endpoint and parameters
+    url = f'{BASE_URL}/movie/{movie_id}/videos'
+    params = {
+        'api_key': API_KEY,
+        'language': 'en-US'
+    }
+
+    # Make the request
+    response = requests.get(url, params=params)
+    if response.status_code != 200:
+        print(f'Error fetching trailer data: {response.status_code}')
+        return None
+
+    videos = response.json().get('results', [])
+    
+    # Filter for trailers
+    for video in videos:
+        if video['type'] == 'Trailer' and video['site'] == 'YouTube':
+            return f'https://www.youtube.com/watch?v={video["key"]}'
+
+    return None
 
 def fetch_genre_by_id(genre_id):
     # Define the endpoint and parameters
@@ -96,22 +128,16 @@ def fetch_genre_by_id(genre_id):
     return {}
 
 
-
-# Define movies_view function
 def movies_view(request, **kwargs):
     current_time = timezone.now()
     movies = Movie.objects.filter(status=True, release_date__lte=current_time).order_by('-movie_id')
     
     # Filter movies by category name
     if 'cat_name' in kwargs:
-        movies = movies.filter(category__name__iexact=kwargs['cat_name'])
-        
-    # # Filter movies by author username
-    # if 'author_username' in kwargs:
-    #     movies = movies.filter(author__username__iexact=kwargs['author_username'])
-    
+        movies = movies.filter(genres__name__iexact=kwargs['cat_name'])
+    categories=Category.objects.annotate(movie_count=Count('movies')).filter(movie_count__gt=0)
     # Pagination
-    paginator = Paginator(movies, 6)
+    paginator = Paginator(movies, 12)
     page_number = request.GET.get('page')
     try:
         movies = paginator.get_page(page_number)
@@ -119,20 +145,28 @@ def movies_view(request, **kwargs):
         movies = paginator.get_page(1)
     except EmptyPage:
         movies = paginator.get_page(paginator.num_pages)
-    
-    context = {'movies': movies}
+# Custom pagination logic for displaying 5-page ranges
+    def get_page_range(current_page, total_pages, max_range=5):
+        start = max(current_page - max_range // 2, 1)
+        end = min(start + max_range - 1, total_pages)
+        start = max(end - max_range + 1, 1)
+        return range(start, end + 1)
+
+    page_range = get_page_range(movies.number, paginator.num_pages)
+
+    context = {
+        'movies': movies,
+        'categories': categories,
+        'page_range': page_range,
+    }
     return render(request, 'blog/movies.html', context)
+
 
 # Define details_view function
 def details_view(request, pid):
-    current_time = timezone.now()
     movie = get_object_or_404(Movie, pk=pid, status=True)
-    
-
-    # Fetch previous and next movies
-    prev_post = Movie.objects.filter(pk__lt=movie.id, status=True, release_date__lte=current_time).order_by('-pk').first()
-    next_post = Movie.objects.filter(pk__gt=movie.id, status=True, release_date__lte=current_time).order_by('pk').first()
-    
+    categories=movie.genres.all()
+    similar_movies =Movie.objects.filter(genres__in=categories).exclude(id=movie.id).distinct()[:10]
     if request.user.is_authenticated:
         comments = Comment.objects.filter(movie=movie, approved=True)
         form = CommentForm()
@@ -149,16 +183,38 @@ def details_view(request, pid):
         
         context = {
             'movie': movie,
+            'categories':categories,
             'comments': comments,
             'form': form,
-            'prev_post': prev_post,
-            'next_post': next_post,
+            'similar_movies':similar_movies ,
         }
         return render(request, 'blog/details.html', context)
     else:
         next_url = reverse('blog:details', kwargs={'pid': movie.id})
         return redirect(f"{reverse('accounts:login')}?next={next_url}")
 
+
+@csrf_exempt
+def rate_movie(request):
+    if request.method == 'POST':
+        import json
+        data = json.loads(request.body)
+        movie_id = data.get('movie_id')
+        rating = data.get('rating')
+        
+        if not movie_id or not rating:
+            return JsonResponse({'message': 'Invalid data'}, status=400)
+        
+        movie = Movie.objects.get(pk=movie_id)
+        # فرض بر این است که هر کاربر می‌تواند فقط یک بار امتیاز بدهد
+        rating_obj, created = Rating.objects.update_or_create(
+            movie=movie,
+            user=request.user,
+            defaults={'rating': rating}
+        )
+        
+        return JsonResponse({'message': 'Rating submitted successfully'})
+    return JsonResponse({'message': 'Invalid method'}, status=405)
 # Define blog_search function
 def blog_search(request):
     current_time = timezone.now()

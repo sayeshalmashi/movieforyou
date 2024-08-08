@@ -64,21 +64,6 @@
 								<a class="header__nav-link" href="{%url 'website:profile'%}">Profile</a>
 							</li>
 							
-							<li class="header__nav-item">
-								<a class="header__nav-link header__nav-link--more" href="#" role="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-									<svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.93893 14.3033C6.08141 14.3033 5.38477 13.6067 5.38477 12.7505C5.38477 11.8943 6.08141 11.1963 6.93893 11.1963C7.79644 11.1963 8.49309 11.8943 8.49309 12.7505C8.49309 13.6067 7.79644 14.3033 6.93893 14.3033Z"/><path d="M12.7501 14.3033C11.8926 14.3033 11.1959 13.6067 11.1959 12.7505C11.1959 11.8943 11.8926 11.1963 12.7501 11.1963C13.6076 11.1963 14.3042 11.8943 14.3042 12.7505C14.3042 13.6067 13.6076 14.3033 12.7501 14.3033Z"/><path d="M18.5608 14.3033C17.7032 14.3033 17.0066 13.6067 17.0066 12.7505C17.0066 11.8943 17.7032 11.1963 18.5608 11.1963C19.4183 11.1963 20.1149 11.8943 20.1149 12.7505C20.1149 13.6067 19.4183 14.3033 18.5608 14.3033Z"/></svg>
-								</a>
-
-								<ul class="dropdown-menu header__nav-menu header__nav-menu--scroll" aria-labelledby="dropdownMenu3">
-									<li><a href="interview.html">Interview</a></li>
-									<li><a href="../admin/index.html" target="_blank">Admin pages</a></li>
-									<li><a href="privacy.html">Privacy policy</a></li>
-									<li><a href="signin.html">Sign in</a></li>
-									<li><a href="{%url 'accounts:login'%}">Sign up</a></li>
-									<li><a href="forgot.html">Forgot password</a></li>
-									<li><a href="404.html">404 Page</a></li>
-								</ul>
-							</li>
 						</ul>
 
 						<div class="header__actions">
@@ -116,34 +101,35 @@
 			</div>
 		</div>
 	</header>
+	{% if messages %}
+	{% for message in messages %}
+		<div style="color: white; margin: 50px; background-color: #2B74D5; padding: 20px; border-radius: 5px;" class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+	{% endfor %}
+{% endif %}
+
+{% if form.errors %}
+	<div  class="alert alert-error">
+		<h4>Please fix the following errors</h4>
+		<ul >
+			{% for field in form %}
+				{% if field.errors %}
+					{% for error in field.errors %}
+						<li><a href="#id_{{ field.name }}" class="error">{{ error|escape }}</a></li>
+					{% endfor %}
+				{% endif %}
+			{% endfor %}
+		</ul>
+		{% if form.non_field_errors %}
+			{{ form.non_field_errors }}
+		{% endif %}
+	</div>
+{% endif %}	
 	<!-- end header -->
     {%block content%}
 
     {%endblock%}
 
-		{% if messages %}
-							{% for message in messages %}
-								<div style="color: white; margin: 50px; background-color: #2B74D5; padding: 20px; border-radius: 5px;" class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
-							{% endfor %}
-						{% endif %}
-					
-						{% if form.errors %}
-							<div  class="alert alert-error">
-								<h4>Please fix the following errors</h4>
-								<ul >
-									{% for field in form %}
-										{% if field.errors %}
-											{% for error in field.errors %}
-												<li><a href="#id_{{ field.name }}" class="error">{{ error|escape }}</a></li>
-											{% endfor %}
-										{% endif %}
-									{% endfor %}
-								</ul>
-								{% if form.non_field_errors %}
-									{{ form.non_field_errors }}
-								{% endif %}
-							</div>
-						{% endif %}	
+	
 
     <footer class="footer">
 		<div class="container">
@@ -153,7 +139,7 @@
 						<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" viewBox="0 0 192 192" xml:space="preserve" fill="none" style="display: inline;"><path d="m88.278 49.408 82.223 49.333-126.074 71.26V22h21.925v109.63l60.298-32.89-38.37-21.926Z" style="fill:none;fill: opacity 0.6 ;stroke:#fff;stroke-width:12;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:5;stroke-dasharray:none;stroke-opacity:1"/></svg>
                             <h1 style="display: inline; font-size: 1.2rem; position: absolute; left: 20%; color: #2B74D5;">TV</h1>
 					</div>
-					<p class="footer__tagline">Movies & TV Shows, Online cinema,<br> Movie database HTML Template.</p>
+					<p class="footer__tagline">Movies & TV Shows for you</p>
 					<div class="footer__social">
 						<a href="#" target="_blank"><svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 15C0 6.71573 6.71573 0 15 0C23.2843 0 30 6.71573 30 15C30 23.2843 23.2843 30 15 30C6.71573 30 0 23.2843 0 15Z" fill="#3B5998"/><path d="M16.5634 23.8197V15.6589H18.8161L19.1147 12.8466H16.5634L16.5672 11.4391C16.5672 10.7056 16.6369 10.3126 17.6904 10.3126H19.0987V7.5H16.8457C14.1394 7.5 13.1869 8.86425 13.1869 11.1585V12.8469H11.4999V15.6592H13.1869V23.8197H16.5634Z" fill="white"/></svg></a>
 						<a href="#" target="_blank"><svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 15C0 6.71573 6.71573 0 15 0C23.2843 0 30 6.71573 30 15C30 23.2843 23.2843 30 15 30C6.71573 30 0 23.2843 0 15Z" fill="#55ACEE"/><path d="M14.5508 12.1922L14.5822 12.7112L14.0576 12.6477C12.148 12.404 10.4798 11.5778 9.06334 10.1902L8.37085 9.50169L8.19248 10.0101C7.81477 11.1435 8.05609 12.3405 8.843 13.1455C9.26269 13.5904 9.16826 13.654 8.4443 13.3891C8.19248 13.3044 7.97215 13.2408 7.95116 13.2726C7.87772 13.3468 8.12953 14.3107 8.32888 14.692C8.60168 15.2217 9.15777 15.7407 9.76631 16.0479L10.2804 16.2915L9.67188 16.3021C9.08432 16.3021 9.06334 16.3127 9.12629 16.5351C9.33613 17.2236 10.165 17.9545 11.0883 18.2723L11.7388 18.4947L11.1723 18.8337C10.3329 19.321 9.34663 19.5964 8.36036 19.6175C7.88821 19.6281 7.5 19.6705 7.5 19.7023C7.5 19.8082 8.78005 20.4014 9.52499 20.6344C11.7598 21.3229 14.4144 21.0264 16.4079 19.8506C17.8243 19.0138 19.2408 17.3507 19.9018 15.7407C20.2585 14.8827 20.6152 13.315 20.6152 12.5629C20.6152 12.0757 20.6467 12.0121 21.2343 11.4295C21.5805 11.0906 21.9058 10.7198 21.9687 10.6139C22.0737 10.4126 22.0632 10.4126 21.5281 10.5927C20.6362 10.9105 20.5103 10.8681 20.951 10.3915C21.2762 10.0525 21.6645 9.43813 21.6645 9.25806C21.6645 9.22628 21.5071 9.27924 21.3287 9.37458C21.1398 9.4805 20.7202 9.63939 20.4054 9.73472L19.8388 9.91479L19.3247 9.56524C19.0414 9.37458 18.6427 9.16273 18.4329 9.09917C17.8978 8.95087 17.0794 8.97206 16.5967 9.14154C15.2852 9.6182 14.4563 10.8469 14.5508 12.1922Z" fill="white"/></svg></a>
@@ -164,62 +150,13 @@
 				</div>
 
 				<div class="col-6 col-md-4 col-lg-3 col-xl-2 order-1 order-md-2 order-lg-1 order-xl-2 offset-md-2 offset-lg-0 offset-xl-1">
-					<h6 class="footer__title">FlixTV</h6>
+					<h6 class="footer__title">MovieForYou</h6>
 					<div class="footer__nav">
-						<a href="about.html">About us</a>
-						<a href="profile.html">My profile</a>
-						<a href="pricing.html">Pricing plans</a>
-						<a href="contacts.html">Contacts</a>
+						<a href="{%url 'website:about'%}">About us</a>
+						<a href="{%url 'website:about'%}">Contacts</a>
 					</div>
 				</div>
 
-				<div class="col-12 col-md-8 col-lg-6 col-xl-4 order-3 order-lg-2 order-md-3 order-xl-3">
-					<div class="row">
-						<div class="col-12">
-							<h6 class="footer__title">Browse</h6>
-						</div>
-
-						<div class="col-6">
-							<div class="footer__nav">
-								<a href="live.html">Live TV</a>
-								<a href="live.html">Live News</a>
-								<a href="live.html">Live Sports</a>
-								<a href="live.html">Streaming Library</a>
-							</div>
-						</div>
-
-						<div class="col-6">
-							<div class="footer__nav">
-								<a href="category.html">TV Shows</a>
-								<a href="category.html">Movies</a>
-								<a href="category.html">Kids</a>
-								<a href="category.html">Collections</a>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<div class="col-6 col-md-4 col-lg-3 col-xl-2 order-2 order-lg-3 order-md-4 order-xl-4">
-					<h6 class="footer__title">Help</h6>
-					<div class="footer__nav">
-						<a href="privacy.html">Account & Billing</a>
-						<a href="privacy.html">Plans & Pricing</a>
-						<a href="privacy.html">Supported devices</a>
-						<a href="privacy.html">Accessibility</a>
-					</div>
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col-12">
-					<div class="footer__content">
-						<div class="footer__links">
-							<a href="privacy.html">Privacy policy</a>
-							<a href="privacy.html">Terms and conditions</a>
-						</div>
-						<small class="footer__copyright">© FlixTV.template, 2021. Created by <a href="https://themeforest.net/user/dmitryvolkov/portfolio" target="_blank">Dmitry Volkov</a>.</small>
-					</div>
-				</div>
 			</div>
 		</div>
 	</footer>

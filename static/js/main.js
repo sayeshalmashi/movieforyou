@@ -455,3 +455,55 @@ $(document).ready(function () {
 
 
 });
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+	const stars = document.querySelectorAll('.star');
+	let selectedValue = 0;
+
+	stars.forEach(star => {
+			star.addEventListener('click', function () {
+					selectedValue = this.getAttribute('data-value');
+					stars.forEach(s => {
+							s.classList.remove('selected');
+							if (s.getAttribute('data-value') <= selectedValue) {
+									s.classList.add('selected');
+							}
+					});
+			});
+	});
+
+	document.getElementById('rating-form').addEventListener('submit', function (event) {
+			event.preventDefault();
+			const movieId = document.getElementById('movie-id').value;
+
+			fetch('/rate-movie/', {
+					method: 'POST',
+					headers: {
+							'Content-Type': 'application/json',
+							'X-CSRFToken': getCookie('csrftoken')  // Make sure you include CSRF token if using Django
+					},
+					body: JSON.stringify({ movie_id: movieId, rating: selectedValue })
+			})
+			.then(response => response.json())
+			.then(data => {
+					document.getElementById('rating-message').textContent = data.message;
+			});
+	});
+
+	function getCookie(name) {
+			let cookieValue = null;
+			if (document.cookie && document.cookie !== '') {
+					const cookies = document.cookie.split(';');
+					for (let i = 0; i < cookies.length; i++) {
+							const cookie = cookies[i].trim();
+							if (cookie.substring(0, name.length + 1) === (name + '=')) {
+									cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+									break;
+							}
+					}
+			}
+			return cookieValue;
+	}
+});

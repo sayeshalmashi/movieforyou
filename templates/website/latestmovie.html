@@ -6,7 +6,7 @@
     {%for movie in movies%}
     <div class="home__card">
       <a href="{%url 'blog:details' pid=movie.id %}">
-        <img src="{% static 'img/home/1.jpg' %}" alt="">
+        <img style="height: 500px; overflow: hidden;" src="https://image.tmdb.org/t/p/w500/{{ movie.poster_path  }}" alt="{{ movie.title }}">
       </a>
       <div>
         <h2>{{movie.title}}</h2>

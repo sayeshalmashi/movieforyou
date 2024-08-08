@@ -26,6 +26,7 @@ class Movie(models.Model):
     release_date = models.DateField(default=DEFAULT_DATE)
     title = models.CharField(max_length=255)
     video = models.BooleanField(default=False)
+    trailer_url = models.URLField(null=True, blank=True)
     vote_average = models.FloatField()
     login_require = models.BooleanField(default=False)
     vote_count = models.IntegerField()
@@ -40,6 +41,14 @@ class Movie(models.Model):
 
     def get_absolute_url(self):
         return reverse('blog:details', kwargs={'pid': self.id})
+ 
+class Rating(models.Model):
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = ('movie', 'user')
  
 class Comment(models.Model):
   movie=models.ForeignKey(Movie,on_delete=models.CASCADE)

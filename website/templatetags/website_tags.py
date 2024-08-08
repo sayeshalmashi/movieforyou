@@ -5,7 +5,7 @@ from blog.models import Movie ,Category
 register = template.Library()
 
 @register.inclusion_tag('website/latestmovie.html')
-def latestmovie(arg=8):
+def latestmovie(arg=12):
   current_time=timezone.now()
   movies=Movie.objects.filter(status=1).order_by('-release_date')[:arg]
   return {'movies':movies}
