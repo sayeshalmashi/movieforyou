@@ -10,7 +10,7 @@ class LatestEntriesFeed(Feed):
     
     def items(self):
         current_time=timezone.now()
-        return Movie.objects.filter(status=True,published_date__lte=current_time)
+        return Movie.objects.filter(status=True)
 
     def item_title(self, item):
         return item.title

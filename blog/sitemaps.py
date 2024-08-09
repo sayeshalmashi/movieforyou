@@ -9,7 +9,4 @@ class BlogSitemap(Sitemap):
 
     def items(self):
         current_time=timezone.now()
-        return Movie.objects.filter(status=1,published_date__lte=current_time)
-
-    def lastmod(self, obj):
-        return obj.published_date
+        return Movie.objects.filter(status=1)
