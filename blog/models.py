@@ -43,12 +43,14 @@ class Movie(models.Model):
         return reverse('blog:details', kwargs={'pid': self.id})
  
 class Rating(models.Model):
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='ratings')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings')
     rating = models.PositiveIntegerField()
+    rated_at = models.DateTimeField(auto_now_add=True)  
 
-    class Meta:
-        unique_together = ('movie', 'user')
+    def __str__(self):
+        return f"{self.user.username} - {self.movie.title}: {self.rating} stars"
+
  
 class Comment(models.Model):
   movie=models.ForeignKey(Movie,on_delete=models.CASCADE)

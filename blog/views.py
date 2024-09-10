@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 from blog.models import Movie, Comment, Category , Rating
-from blog.forms import CommentForm
+from blog.forms import CommentForm  , RatingForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
 from django.http import JsonResponse
@@ -165,28 +165,57 @@ def movies_view(request, **kwargs):
 # Define details_view function
 def details_view(request, pid):
     movie = get_object_or_404(Movie, pk=pid, status=True)
-    categories=movie.genres.all()
-    similar_movies =Movie.objects.filter(genres__in=categories).exclude(id=movie.id).distinct()[:10]
+    categories = movie.genres.all()
+    similar_movies = Movie.objects.filter(genres__in=categories).exclude(id=movie.id).distinct()[:10]
+    comments = Comment.objects.filter(movie=movie, approved=True)
+    form = CommentForm()
+    rating_form = RatingForm()
+    user_rating = None
+
     if request.user.is_authenticated:
-        comments = Comment.objects.filter(movie=movie, approved=True)
-        form = CommentForm()
-        
+        # اگر کاربر قبلاً به فیلم امتیاز داده باشد
+        try:
+            user_rating = Rating.objects.get(movie=movie, user=request.user)
+        except Rating.DoesNotExist:
+            user_rating = None
+
         if request.method == 'POST':
-            form = CommentForm(request.POST)
-            if form.is_valid():
-                comment = form.save(commit=False)
-                comment.movie = movie
-                comment.save()
-                messages.success(request, "Your comment was submitted successfully.")
-            else:
-                messages.error(request, "There was an error submitting your comment.")
-        
+            # اگر فرم کامنت ارسال شده است
+            if 'submit_comment' in request.POST:
+                form = CommentForm(request.POST)
+                if form.is_valid():
+                    comment = form.save(commit=False)
+                    comment.movie = movie
+                    comment.user = request.user
+                    comment.save()
+                    messages.success(request, "Your comment was submitted successfully.")
+                else:
+                    messages.error(request, "There was an error submitting your comment.")
+
+            # اگر فرم رتبه‌دهی ارسال شده است
+            if 'submit_rating' in request.POST:
+                rating_value = request.POST.get('rating')
+                if rating_value:
+                    rating_value = int(rating_value)
+                    if 1 <= rating_value <= 5:
+                        # ایجاد یک رکورد جدید برای هر امتیاز
+                        rating_obj = Rating.objects.create(
+                            movie=movie,
+                            user=request.user,
+                            rating=rating_value
+                        )
+                        messages.success(request, "Your rating was submitted successfully.")
+                    else:
+                        messages.error(request, "Invalid rating value.")
+
         context = {
             'movie': movie,
-            'categories':categories,
+            'categories': categories,
             'comments': comments,
             'form': form,
-            'similar_movies':similar_movies ,
+            'similar_movies': similar_movies,
+            'rating_form': rating_form,
+            'user_rating': user_rating,
         }
         return render(request, 'blog/details.html', context)
     else:
@@ -194,27 +223,7 @@ def details_view(request, pid):
         return redirect(f"{reverse('accounts:login')}?next={next_url}")
 
 
-@csrf_exempt
-def rate_movie(request):
-    if request.method == 'POST':
-        import json
-        data = json.loads(request.body)
-        movie_id = data.get('movie_id')
-        rating = data.get('rating')
-        
-        if not movie_id or not rating:
-            return JsonResponse({'message': 'Invalid data'}, status=400)
-        
-        movie = Movie.objects.get(pk=movie_id)
-        # فرض بر این است که هر کاربر می‌تواند فقط یک بار امتیاز بدهد
-        rating_obj, created = Rating.objects.update_or_create(
-            movie=movie,
-            user=request.user,
-            defaults={'rating': rating}
-        )
-        
-        return JsonResponse({'message': 'Rating submitted successfully'})
-    return JsonResponse({'message': 'Invalid method'}, status=405)
+
 # Define blog_search function
 def blog_search(request):
     current_time = timezone.now()
