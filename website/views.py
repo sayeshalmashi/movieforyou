@@ -1,9 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render , redirect
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from website.forms import ContactForm
 from django.contrib import messages
+from django.shortcuts import render
+from blog.models import Rating
 
 def index_view(request):
   return render(request,'website/index.html')
@@ -33,5 +35,12 @@ def interview_view(request):
 
 @login_required(login_url='accounts/login')
 def profile_view(request):
-  return render(request, 'website/profile.html')
+    if not request.user.is_authenticated:
+        return redirect('accounts:login')
 
+    user_ratings = Rating.objects.filter(user=request.user).select_related('movie')
+
+    context = {
+        'user_ratings': user_ratings
+    }
+    return render(request, 'website/profile.html', context)

@@ -173,14 +173,38 @@ def details_view(request, pid):
     user_rating = None
 
     if request.user.is_authenticated:
-        # اگر کاربر قبلاً به فیلم امتیاز داده باشد
         try:
             user_rating = Rating.objects.get(movie=movie, user=request.user)
         except Rating.DoesNotExist:
             user_rating = None
 
         if request.method == 'POST':
-            # اگر فرم کامنت ارسال شده است
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                rating_value = request.POST.get('rating')
+                if rating_value:
+                    rating_value = int(rating_value)
+                    if 1 <= rating_value <= 5:
+                        rating_obj, created = Rating.objects.update_or_create(
+                            movie=movie,
+                            user=request.user,
+                            defaults={'rating': rating_value}
+                        )
+                        messages.success(request, f'Your rating of {rating_value} stars was submitted successfully.')
+                        return JsonResponse({
+                            'success': True,
+                            'rating': rating_obj.rating
+                        })
+                    else:
+                        return JsonResponse({
+                            'success': False,
+                            'message': 'Invalid rating value.'
+                        }, status=400)
+                else:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'No rating value provided.'
+                    }, status=400)
+
             if 'submit_comment' in request.POST:
                 form = CommentForm(request.POST)
                 if form.is_valid():
@@ -192,22 +216,6 @@ def details_view(request, pid):
                 else:
                     messages.error(request, "There was an error submitting your comment.")
 
-            # اگر فرم رتبه‌دهی ارسال شده است
-            if 'submit_rating' in request.POST:
-                rating_value = request.POST.get('rating')
-                if rating_value:
-                    rating_value = int(rating_value)
-                    if 1 <= rating_value <= 5:
-                        # ایجاد یک رکورد جدید برای هر امتیاز
-                        rating_obj = Rating.objects.create(
-                            movie=movie,
-                            user=request.user,
-                            rating=rating_value
-                        )
-                        messages.success(request, "Your rating was submitted successfully.")
-                    else:
-                        messages.error(request, "Invalid rating value.")
-
         context = {
             'movie': movie,
             'categories': categories,
@@ -218,12 +226,12 @@ def details_view(request, pid):
             'user_rating': user_rating,
         }
         return render(request, 'blog/details.html', context)
+
     else:
         next_url = reverse('blog:details', kwargs={'pid': movie.id})
         return redirect(f"{reverse('accounts:login')}?next={next_url}")
-
-
-
+    
+    
 # Define blog_search function
 def blog_search(request):
     current_time = timezone.now()
