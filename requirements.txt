@@ -9,3 +9,7 @@ django-multi-captcha-admin
 django-robots
 django-debug-toolbar
 django-compressor
+djangorestframework
+requests
+numpy
+scikit-learn
