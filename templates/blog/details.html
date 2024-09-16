@@ -3,6 +3,42 @@
 {%load compress%}
 {%load humanize%}
 {% block content %}
+<style>
+.rating-options {
+  display: flex;
+  justify-content: space-between;
+  max-width: 300px;
+  margin: 20px 0;
+}
+
+.rating-options label {
+  cursor: pointer;
+  background-color: #2f80ed;
+	color: #ddd;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  border: 2px solid transparent;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.rating-options input[type="radio"] {
+  display: none;
+}
+
+.rating-options input[type="radio"]:checked + label {
+  background-color: #f39c12; 
+  color: #fff;
+  border-color: #e67e22;
+}
+
+.rating-options label:hover {
+  background-color: #ddd;
+	color: #2f80ed;
+}
+
+
+</style>
 	<!-- details -->
 	<section class="section section--head section--head-fixed section--gradient section--details-bg">
 		<div class="section__bg" data-bg="https://image.tmdb.org/t/p/w500/{{ movie.poster_path  }}"></div>
@@ -154,22 +190,37 @@
 					</div> -->
 					<!-- end series -->
 
-					<div class="col-12 col-xl-8">
-						<h3>Rate this Movie</h3>
-						<div id="rating-system">
-								<form id="rating-form">
-										<input type="hidden" id="movie-id" value="{{ movie.id }}">
-										<div class="rating">
-												<span class="star" data-value="1">&#9733;</span>
-												<span class="star" data-value="2">&#9733;</span>
-												<span class="star" data-value="3">&#9733;</span>
-												<span class="star" data-value="4">&#9733;</span>
-												<span class="star" data-value="5">&#9733;</span>
-										</div>
-										<button type="submit">Submit Rating</button>
-								</form>
-								<p id="rating-message"></p>
-						</div>
+					<div class="col-12 col-xl-8 mt-5">
+						<h3 style="color: #ddd;">Rate This Movie</h3>
+						<form method="post" id="rating-form">
+							{% csrf_token %}
+							<div class="rating-options">
+									<input type="radio" id="rating-1" name="rating" value="1">
+									<label for="rating-1">1</label>
+					
+									<input type="radio" id="rating-2" name="rating" value="2">
+									<label for="rating-2">2</label>
+					
+									<input type="radio" id="rating-3" name="rating" value="3">
+									<label for="rating-3">3</label>
+					
+									<input type="radio" id="rating-4" name="rating" value="4">
+									<label for="rating-4">4</label>
+					
+									<input type="radio" id="rating-5" name="rating" value="5">
+									<label for="rating-5">5</label>
+							</div>
+							<button type="submit" name="" class="sign__btn">Submit Rating</button>
+					  </form>
+						
+						<p id="user-rating-display" style="color: #ddd;">
+							{% if user_rating %}
+									Your current rating is: {{ user_rating.rating }}
+							{% else %}
+									You haven't rated this movie yet.
+							{% endif %}
+					</p>
+						
 				</div>
 				
 				</div>
@@ -315,7 +366,7 @@
 										</div>
 									
 
-										<button type="submit" class="sign__btn">Send</button>
+										<button type="submit" name="submit_comment" class="sign__btn">Send</button>
 									</form>
 								</div>
 								<!-- end comments -->
@@ -469,6 +520,41 @@
 			</div>
 		</div>
 	</section>
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+				const ratingForm = document.getElementById('rating-form');
+		
+				ratingForm.addEventListener('submit', function(event) {
+						event.preventDefault(); // جلوگیری از ارسال فرم به روش سنتی
+		
+						const formData = new FormData(ratingForm); // جمع‌آوری اطلاعات فرم
+						const csrfToken = formData.get('csrfmiddlewaretoken');
+		
+						// ارسال درخواست AJAX به همان ویوی details_view
+						fetch(window.location.href, {
+								method: 'POST',
+								headers: {
+										'X-CSRFToken': csrfToken,
+										'X-Requested-With': 'XMLHttpRequest'
+								},
+								body: formData
+						})
+						.then(response => response.json())
+						.then(data => {
+								if (data.success) {
+										// به‌روزرسانی بخش نمایش امتیاز
+										const ratingDisplay = document.getElementById('user-rating-display');
+										ratingDisplay.textContent = `Your current rating: ${data.rating} stars`;
+								} else {
+										alert(data.message); // نمایش خطا در صورت وجود مشکل
+								}
+						})
+						.catch(error => {
+								console.error('Error:', error);
+						});
+				});
+		});
+		</script>
 	<!-- end similar -->
 
 {%endblock%}

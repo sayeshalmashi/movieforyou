@@ -1,5 +1,5 @@
 from django.contrib import admin
-from blog.models import Movie , Category ,Comment
+from blog.models import Movie , Category ,Comment, Rating
 # Register your models here.
 
 class MovieAdmin(admin.ModelAdmin):
@@ -18,7 +18,13 @@ class CommentAdmin(admin.ModelAdmin):
   list_filter=('movie','approved',) #topple akharesh ,
   ordering=['-created_date']
   search_fields=['name','movie']
+  
+class RatingAdmin(admin.ModelAdmin):
+    list_display = ('user', 'movie', 'rating', 'rated_at')
+    list_filter = ('user', 'movie', 'rating') 
+    search_fields = ('user__username', 'movie__title')
 
+admin.site.register(Rating, RatingAdmin)
 admin.site.register(Comment,CommentAdmin)
 admin.site.register(Movie,MovieAdmin)
 admin.site.register(Category)
