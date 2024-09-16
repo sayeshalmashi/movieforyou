@@ -6,6 +6,7 @@ from website.forms import ContactForm
 from django.contrib import messages
 from django.shortcuts import render
 from blog.models import Rating
+from blog.recommender import recommend_movies
 
 def index_view(request):
   return render(request,'website/index.html')
@@ -33,6 +34,7 @@ def error_view(request):
 def interview_view(request):
   return render(request, 'website/interview.html')
 
+
 @login_required(login_url='accounts/login')
 def profile_view(request):
     if not request.user.is_authenticated:
@@ -40,7 +42,13 @@ def profile_view(request):
 
     user_ratings = Rating.objects.filter(user=request.user).select_related('movie')
 
+    rated_movies = [rating.movie for rating in user_ratings]
+
+    recommended_movies = recommend_movies(rated_movies)
+
     context = {
-        'user_ratings': user_ratings
+        'user_ratings': user_ratings,
+        'recommended_movies': recommended_movies, 
     }
+
     return render(request, 'website/profile.html', context)

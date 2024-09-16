@@ -11,3 +11,5 @@ django-debug-toolbar
 django-compressor
 djangorestframework
 requests
+numpy
+scikit-learn
