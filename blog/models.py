@@ -46,12 +46,14 @@ class Rating(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='ratings')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings')
     rating = models.PositiveIntegerField()
-    rated_at = models.DateTimeField(auto_now_add=True)  
+    rated_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.movie.title}: {self.rating} stars"
 
- 
+    @property
+    def movie_id(self):
+        return self.movie.id
 class Comment(models.Model):
   movie=models.ForeignKey(Movie,on_delete=models.CASCADE)
   name=models.CharField(max_length=255)

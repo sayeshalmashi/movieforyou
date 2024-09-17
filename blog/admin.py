@@ -20,7 +20,7 @@ class CommentAdmin(admin.ModelAdmin):
   search_fields=['name','movie']
   
 class RatingAdmin(admin.ModelAdmin):
-    list_display = ('user', 'movie', 'rating', 'rated_at')
+    list_display = ('user', 'movie', 'rating', 'rated_at' ,'movie_id')
     list_filter = ('user', 'movie', 'rating') 
     search_fields = ('user__username', 'movie__title')
 
