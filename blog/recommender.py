@@ -14,6 +14,16 @@ def convert(obj):
     return l
 movies['genres'] = movies['genres'].apply(convert)
 movies['keywords'] = movies['keywords'].apply(convert)
+def convert3(obj):
+    l = []
+    counter = 0
+    for i in ast.literal_eval(obj):
+        if counter != 3:
+            l.append(i['name'])
+            counter += 1
+        else:
+            break
+    return l
 movies['cast'] = movies['cast'].apply(convert3)
 def crew_director(obj):
     l = []
