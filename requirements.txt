@@ -13,3 +13,4 @@ djangorestframework
 requests
 numpy
 scikit-learn
+nltk

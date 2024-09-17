@@ -6,7 +6,8 @@ from website.forms import ContactForm
 from django.contrib import messages
 from django.shortcuts import render
 from blog.models import Rating
-from blog.recommender import recommend_movies , preprocess_data
+from blog.recommender import recommend , similarity
+import pandas as pd # data processing
 
 def index_view(request):
   return render(request,'website/index.html')
@@ -35,28 +36,27 @@ def interview_view(request):
   return render(request, 'website/interview.html')
 
 
-@login_required(login_url='accounts/login')
+@login_required(login_url='accounts:login')
 def profile_view(request):
     if not request.user.is_authenticated:
         return redirect('accounts:login')
 
-    # دریافت ریتینگ‌های کاربر
+    # Get user ratings
     user_ratings = Rating.objects.filter(user=request.user).select_related('movie')
+    rated_movies = [rating.movie.title for rating in user_ratings]
 
-    # فیلم‌هایی که کاربر ریت کرده است
-    rated_movies = [rating.movie for rating in user_ratings]
-
-    # بارگذاری داده‌های فیلم‌ها
-    movies_df = preprocess_data()
-
-    # پیشنهاد فیلم‌ها با استفاده از فیلم‌های ریت شده کاربر و داده‌های همه فیلم‌ها
-    recommended_movies = []
+    # Recommend movies based on user's rated movies
+    recommended_movies = set()  # استفاده از set برای جلوگیری از موارد تکراری
     if rated_movies:
-        recommended_movies = recommend_movies(rated_movies, movies_df)
+        for movie in rated_movies:
+            recommendations = recommend(movie)
+            if recommendations:  # اطمینان از اینکه تابع recommend نتیجه دارد
+                recommended_movies.update(recommendations)
 
+    # Pass data to the template
     context = {
         'user_ratings': user_ratings,
-        'recommended_movies': recommended_movies,  # اضافه کردن فیلم‌های پیشنهادی به کانتکست
+        'recommended_movies': list(recommended_movies),  # تبدیل set به list برای ارسال به قالب
     }
 
     return render(request, 'website/profile.html', context)
