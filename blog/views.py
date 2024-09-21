@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
-from blog.models import Movie, Comment, Category , Rating
+from blog.models import Movie, Comment, Category , Rating , Keyword
 from blog.forms import CommentForm  , RatingForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
@@ -78,10 +78,40 @@ def fetch_and_save_movies():
             if trailer_url:
                 movie.trailer_url = trailer_url
 
+            # Fetch and save keywords
+            keywords = fetch_keywords(movie_data['id'])
+            for keyword_data in keywords:
+                keyword, _ = Keyword.objects.get_or_create(
+                    keyword_id=keyword_data['id'],
+                    defaults={'name': keyword_data['name']}
+                )
+                movie.keywords.add(keyword)
+
             movie.save()
 
         total_movies += len(movies)
         page += 1
+
+
+def fetch_keywords(movie_id):
+    # Define the endpoint for keywords
+    url = f'{BASE_URL}/movie/{movie_id}/keywords'
+    params = {
+        'api_key': API_KEY
+    }
+
+    # Make the request
+    response = requests.get(url, params=params)
+    if response.status_code != 200:
+        print(f'Error fetching keywords: {response.status_code}')
+        return []
+
+    # Get keywords from the response
+    keywords = response.json().get('keywords', [])
+    return keywords
+
+
+
 
 def fetch_trailer_url(movie_id):
     # Define the endpoint and parameters

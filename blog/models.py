@@ -13,6 +13,13 @@ class Category(models.Model):
         return self.name
 
 
+class Keyword(models.Model):
+    keyword_id = models.IntegerField(unique=True, null=True)
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
 class Movie(models.Model):
     adult = models.BooleanField(default=False)
     backdrop_path = models.CharField(max_length=255, blank=True, null=True)
@@ -31,7 +38,7 @@ class Movie(models.Model):
     login_require = models.BooleanField(default=False)
     vote_count = models.IntegerField()
     status = models.BooleanField(default=True)
-
+    keywords = models.ManyToManyField(Keyword, related_name='movies', blank=True)
 
     class Meta:
         ordering = ['-release_date']
@@ -41,7 +48,8 @@ class Movie(models.Model):
 
     def get_absolute_url(self):
         return reverse('blog:details', kwargs={'pid': self.id})
- 
+
+
 class Rating(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='ratings')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings')
