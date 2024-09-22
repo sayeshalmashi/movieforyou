@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
-from blog.models import Movie, Comment, Category , Rating , Keyword
+from blog.models import Movie, Comment, Category , Rating , Keyword , Crew , Cast
 from blog.forms import CommentForm  , RatingForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
@@ -86,11 +86,61 @@ def fetch_and_save_movies():
                     defaults={'name': keyword_data['name']}
                 )
                 movie.keywords.add(keyword)
+                
+                
+            cast_data, crew_data = fetch_cast_and_crew(movie_data['id'])
+
+
+            for cast_member in cast_data:
+                cast, _ = Cast.objects.get_or_create(
+                    cast_id=cast_member['id'],
+                    defaults={
+                        'name': cast_member['name'],
+                        'character': cast_member.get('character'),
+                        'profile_path': cast_member.get('profile_path'),
+                        'order': cast_member.get('order')
+                    }
+                )
+                movie.cast.add(cast)
+
+            for crew_member in crew_data:
+                crew, _ = Crew.objects.get_or_create(
+                    crew_id=crew_member['id'],
+                    defaults={
+                        'name': crew_member['name'],
+                        'job': crew_member.get('job'),
+                        'department': crew_member.get('department'),
+                        'profile_path': crew_member.get('profile_path')
+                    }
+                )
+                movie.crew.add(crew)
+
 
             movie.save()
 
         total_movies += len(movies)
         page += 1
+
+
+
+def fetch_cast_and_crew(movie_id):
+    url = f'{BASE_URL}/movie/{movie_id}/credits'
+    params = {
+        'api_key': API_KEY,
+        'language': 'en-US'
+    }
+
+    response = requests.get(url, params=params)
+    if response.status_code != 200:
+        print(f'Error fetching credits data: {response.status_code}')
+        return [], []
+
+    data = response.json()
+
+    cast_data = data.get('cast', [])
+    crew_data = data.get('crew', [])
+
+    return cast_data, crew_data
 
 
 def fetch_keywords(movie_id):

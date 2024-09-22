@@ -19,6 +19,29 @@ class Keyword(models.Model):
 
     def __str__(self):
         return self.name
+    
+class Cast(models.Model):
+    cast_id = models.IntegerField(unique=True)
+    name = models.CharField(max_length=255)
+    character = models.CharField(max_length=255, blank=True, null=True)
+    profile_path = models.CharField(max_length=255, blank=True, null=True)
+    order = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Crew(models.Model):
+    crew_id = models.IntegerField(unique=True)
+    name = models.CharField(max_length=255)
+    job = models.CharField(max_length=255)
+    department = models.CharField(max_length=255)
+    profile_path = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
 
 class Movie(models.Model):
     adult = models.BooleanField(default=False)
@@ -39,6 +62,8 @@ class Movie(models.Model):
     vote_count = models.IntegerField()
     status = models.BooleanField(default=True)
     keywords = models.ManyToManyField(Keyword, related_name='movies', blank=True)
+    cast = models.ManyToManyField(Cast, related_name='movies', blank=True)
+    crew = models.ManyToManyField(Crew, related_name='movies', blank=True)
 
     class Meta:
         ordering = ['-release_date']
