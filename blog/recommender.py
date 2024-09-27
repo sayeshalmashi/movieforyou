@@ -1,96 +1,74 @@
 import os
-import numpy as np
-import pandas as pd
-import ast
+import django
+
+# Set the DJANGO_SETTINGS_MODULE environment variable
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'movieforyou.settings')
+
+# Setup Django
+django.setup()
+
+from blog.models import Movie, Rating
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.feature_extraction.text import CountVectorizer
-from nltk.stem.porter import PorterStemmer
-import pickle
+import pandas as pd
 
-# Load movie data
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-movies_file = os.path.join(BASE_DIR, 'tmdb_5000_movies.csv')
-credits_file = os.path.join(BASE_DIR, 'tmdb_5000_credits.csv')
+# Define the function for generating recommendations
+def recommend_movies_for_user(user, num_recommendations=5):
+    # Get user's rated movies
+    user_ratings = Rating.objects.filter(user=user).select_related('movie')
 
-movies = pd.read_csv(movies_file)
-credits = pd.read_csv(credits_file)
-movies = movies.merge(credits, on='title', suffixes=('_movies', '_credits'))
-movies = movies[['movie_id', 'title', 'overview', 'genres', 'keywords', 'cast', 'crew']]
-movies_cleaned = movies.dropna()
-movies = movies_cleaned
-
-# Data processing functions
-def convert(obj):
-    return [i['name'] for i in ast.literal_eval(obj)]
-
-movies['genres'] = movies['genres'].apply(convert)
-movies['keywords'] = movies['keywords'].apply(convert)
-
-def convert3(obj):
-    l = []
-    counter = 0
-    for i in ast.literal_eval(obj):
-        if counter != 3:
-            l.append(i['name'])
-            counter += 1
-        else:
-            break
-    return l
-
-movies['cast'] = movies['cast'].apply(convert3)
-
-def crew_director(obj):
-    for i in ast.literal_eval(obj):
-        if i['job'] == 'Director':
-            return [i['name']]
-    return []
-
-movies['crew'] = movies['crew'].apply(crew_director)
-movies = movies.rename(columns={'crew': 'director'})
-movies['overview'] = movies['overview'].apply(lambda x: x.split())
-
-# Combine tags into a single string and convert to lowercase
-movies['tags'] = movies['overview'] + movies['genres'] + movies['keywords'] + movies['cast'] + movies['director']
-df = movies[['movie_id', 'title', 'tags']]
-
-# Fixing the warning by using .loc
-df.loc[:, 'tags'] = df['tags'].apply(lambda x: " ".join(x).lower())
-
-# Stemming
-ps = PorterStemmer()
-
-def stem(text):
-    return " ".join([ps.stem(word) for word in text.split()])
-
-df.loc[:, 'tags'] = df['tags'].apply(stem)
-
-# Vectorizing and similarity calculation
-cv = CountVectorizer(max_features=5000, stop_words='english')
-vectors = cv.fit_transform(df['tags']).toarray()
-similarity = cosine_similarity(vectors)
-
-# Save model and vectorizer
-with open(os.path.join(BASE_DIR, 'similarity.pkl'), 'wb') as f:
-    pickle.dump(similarity, f)
-with open(os.path.join(BASE_DIR, 'vectorizer.pkl'), 'wb') as f:
-    pickle.dump(cv, f)
-
-# Movie recommendation function
-def recommend(movie):
-    # بررسی اینکه آیا فیلم در دیتافریم وجود دارد
-    if movie not in df['title'].values:
-        print(f"Movie '{movie}' not found in dataset.")
+    # If user hasn't rated any movies, return an empty list
+    if not user_ratings.exists():
         return []
 
-    # پیدا کردن ایندکس فیلم
-    movie_index = df[df['title'] == movie].index[0]
-    distances = similarity[movie_index]
+    # Create a DataFrame for user-rated movies
+    rated_movies_df = pd.DataFrame(
+        [(r.movie.id, r.movie.title, r.movie.overview, ' '.join([g.name for g in r.movie.genres.all()]), 
+         ' '.join([k.name for k in r.movie.keywords.all()]), r.rating) 
+         for r in user_ratings],
+        columns=['movie_id', 'title', 'overview', 'genres', 'keywords', 'rating']
+    )
 
-    # مرتب‌سازی لیست فیلم‌ها
-    movies_list = sorted(list(enumerate(distances)), reverse=True, key=lambda x: x[1])[1:6]
-    
-    # نمایش عناوین فیلم‌های پیشنهادی
-    recommended_movies = [df.iloc[i[0]].title for i in movies_list]
-    print(f"Recommended movies for '{movie}': {recommended_movies}")
-    return recommended_movies
+    # Combine text data for each rated movie
+    rated_movies_df['combined_features'] = rated_movies_df['overview'] + ' ' + rated_movies_df['genres'] + ' ' + rated_movies_df['keywords']
+
+    # Get all other movies
+    all_movies = Movie.objects.exclude(id__in=rated_movies_df['movie_id'])
+
+    # Create a DataFrame for all other movies
+    all_movies_df = pd.DataFrame(
+        [(m.id, m.title, m.overview, ' '.join([g.name for g in m.genres.all()]), 
+         ' '.join([k.name for k in m.keywords.all()])) 
+         for m in all_movies],
+        columns=['movie_id', 'title', 'overview', 'genres', 'keywords']
+    )
+
+    # Combine text data for each movie
+    all_movies_df['combined_features'] = all_movies_df['overview'] + ' ' + all_movies_df['genres'] + ' ' + all_movies_df['keywords']
+
+    # TF-IDF vectorization
+    tfidf = TfidfVectorizer(stop_words='english')
+    tfidf_matrix_rated = tfidf.fit_transform(rated_movies_df['combined_features'])
+    tfidf_matrix_all = tfidf.transform(all_movies_df['combined_features'])
+
+    # Calculate cosine similarity between rated movies and all other movies
+    cosine_similarities = cosine_similarity(tfidf_matrix_rated, tfidf_matrix_all)
+
+    # Get top rated movies by the user (high rating)
+    top_rated_movies = rated_movies_df[rated_movies_df['rating'] >= 4]
+
+    # Get recommendations based on the top-rated movies
+    similar_movies = []
+    for idx, movie in top_rated_movies.iterrows():
+        sim_scores = list(enumerate(cosine_similarities[idx]))
+        sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+        top_similar_movie_indices = [i[0] for i in sim_scores[:num_recommendations]]
+        top_similar_movies = all_movies_df.iloc[top_similar_movie_indices]
+        similar_movies.append(top_similar_movies)
+
+    # Concatenate all recommended movies and remove duplicates
+    recommendations = pd.concat(similar_movies).drop_duplicates(subset=['movie_id']).head(num_recommendations)
+
+    # Return movie titles
+    return recommendations['title'].tolist()
