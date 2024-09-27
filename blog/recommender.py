@@ -1,95 +1,74 @@
 import os
-import numpy as np
-import pandas as pd
-import ast
-import requests
+import django
+
+# Set the DJANGO_SETTINGS_MODULE environment variable
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'movieforyou.settings')
+
+# Setup Django
+django.setup()
+
+from blog.models import Movie, Rating
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.feature_extraction.text import CountVectorizer
-from nltk.stem.porter import PorterStemmer
-import pickle
+import pandas as pd
 
-# API Key and Base URL for TMDb
-API_KEY = '5903757e800fec82004573c343c707d5'
-MOVIES_API_URL = f"https://api.themoviedb.org/3/movie/popular?api_key={API_KEY}&language=en-US&page=1"
-GENRE_API_URL = f"https://api.themoviedb.org/3/genre/movie/list?api_key={API_KEY}&language=en-US"
 
-# Get the list of genres from TMDb
-def get_genres():
-    response = requests.get(GENRE_API_URL)
-    data = response.json()
-    genres = {genre['id']: genre['name'] for genre in data['genres']}
-    return genres
+# Define the function for generating recommendations
+def recommend_movies_for_user(user, num_recommendations=5):
+    # Get user's rated movies
+    user_ratings = Rating.objects.filter(user=user).select_related('movie')
 
-genres_dict = get_genres()
-
-# Get movies from TMDb API
-def get_movies_from_api():
-    response = requests.get(MOVIES_API_URL)
-    data = response.json()
-    movies = data['results']
-    
-    # Process movie data
-    processed_movies = []
-    for movie in movies:
-        movie_data = {
-            'movie_id': movie['id'],
-            'title': movie['title'],
-            'overview': movie['overview'].split(),
-            'genres': [genres_dict[genre_id] for genre_id in movie['genre_ids']],
-            'keywords': [],  # If you have keywords available
-            'cast': [],  # Cast can be added if available
-            'director': []  # Director can be added if available
-        }
-        processed_movies.append(movie_data)
-
-    return processed_movies
-
-# Fetch movies from API
-movies = get_movies_from_api()
-movies_df = pd.DataFrame(movies)
-
-# Combine tags into a single string and convert to lowercase
-movies_df['tags'] = movies_df['overview'] + movies_df['genres'] + movies_df['keywords'] + movies_df['cast'] + movies_df['director']
-df = movies_df[['movie_id', 'title', 'tags']]
-
-# Fixing the warning by using .loc
-df.loc[:, 'tags'] = df['tags'].apply(lambda x: " ".join(x).lower())
-
-# Stemming
-ps = PorterStemmer()
-
-def stem(text):
-    return " ".join([ps.stem(word) for word in text.split()])
-
-df.loc[:, 'tags'] = df['tags'].apply(stem)
-
-# Vectorizing and similarity calculation
-cv = CountVectorizer(max_features=5000, stop_words='english')
-vectors = cv.fit_transform(df['tags']).toarray()
-similarity = cosine_similarity(vectors)
-
-# Save model and vectorizer
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-with open(os.path.join(BASE_DIR, 'similarity.pkl'), 'wb') as f:
-    pickle.dump(similarity, f)
-with open(os.path.join(BASE_DIR, 'vectorizer.pkl'), 'wb') as f:
-    pickle.dump(cv, f)
-
-# Movie recommendation function
-def recommend(movie):
-    # Check if the movie exists in the dataset
-    if movie not in df['title'].values:
-        print(f"Movie '{movie}' not found in dataset.")
+    # If user hasn't rated any movies, return an empty list
+    if not user_ratings.exists():
         return []
 
-    # Get movie index
-    movie_index = df[df['title'] == movie].index[0]
-    distances = similarity[movie_index]
+    # Create a DataFrame for user-rated movies
+    rated_movies_df = pd.DataFrame(
+        [(r.movie.id, r.movie.title, r.movie.overview, ' '.join([g.name for g in r.movie.genres.all()]), 
+         ' '.join([k.name for k in r.movie.keywords.all()]), r.rating) 
+         for r in user_ratings],
+        columns=['movie_id', 'title', 'overview', 'genres', 'keywords', 'rating']
+    )
 
-    # Sort movie recommendations
-    movies_list = sorted(list(enumerate(distances)), reverse=True, key=lambda x: x[1])[1:6]
-    
-    # Display recommended movie titles
-    recommended_movies = [df.iloc[i[0]].title for i in movies_list]
-    print(f"Recommended movies for '{movie}': {recommended_movies}")
-    return recommended_movies
+    # Combine text data for each rated movie
+    rated_movies_df['combined_features'] = rated_movies_df['overview'] + ' ' + rated_movies_df['genres'] + ' ' + rated_movies_df['keywords']
+
+    # Get all other movies
+    all_movies = Movie.objects.exclude(id__in=rated_movies_df['movie_id'])
+
+    # Create a DataFrame for all other movies
+    all_movies_df = pd.DataFrame(
+        [(m.id, m.title, m.overview, ' '.join([g.name for g in m.genres.all()]), 
+         ' '.join([k.name for k in m.keywords.all()])) 
+         for m in all_movies],
+        columns=['movie_id', 'title', 'overview', 'genres', 'keywords']
+    )
+
+    # Combine text data for each movie
+    all_movies_df['combined_features'] = all_movies_df['overview'] + ' ' + all_movies_df['genres'] + ' ' + all_movies_df['keywords']
+
+    # TF-IDF vectorization
+    tfidf = TfidfVectorizer(stop_words='english')
+    tfidf_matrix_rated = tfidf.fit_transform(rated_movies_df['combined_features'])
+    tfidf_matrix_all = tfidf.transform(all_movies_df['combined_features'])
+
+    # Calculate cosine similarity between rated movies and all other movies
+    cosine_similarities = cosine_similarity(tfidf_matrix_rated, tfidf_matrix_all)
+
+    # Get top rated movies by the user (high rating)
+    top_rated_movies = rated_movies_df[rated_movies_df['rating'] >= 4]
+
+    # Get recommendations based on the top-rated movies
+    similar_movies = []
+    for idx, movie in top_rated_movies.iterrows():
+        sim_scores = list(enumerate(cosine_similarities[idx]))
+        sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+        top_similar_movie_indices = [i[0] for i in sim_scores[:num_recommendations]]
+        top_similar_movies = all_movies_df.iloc[top_similar_movie_indices]
+        similar_movies.append(top_similar_movies)
+
+    # Concatenate all recommended movies and remove duplicates
+    recommendations = pd.concat(similar_movies).drop_duplicates(subset=['movie_id']).head(num_recommendations)
+
+    # Return movie titles
+    return recommendations['title'].tolist()
