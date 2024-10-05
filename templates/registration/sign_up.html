@@ -35,9 +35,6 @@
 						<!-- registration form -->
 						<form method="post" class="sign__form">
 							{% csrf_token %}
-							<a href="index.html" class="sign__logo">
-								<img src="{% static 'img/logo.svg' %}" alt="">
-							</a>
 
 							<div class="sign__group">
 								<input type="text" name="username" class="sign__input" placeholder="Name" required>

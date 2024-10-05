@@ -60,9 +60,6 @@
 						<!-- authorization form -->
 						<form action="{%url 'accounts:login' %}" method="post" class="sign__form">
 							{%csrf_token%}
-							<a href="{%url 'website:index'%}" class="sign__logo">
-								<img src="{% static 'img/logo.svg' %}" alt="">
-							</a>
 
 							<div class="sign__group">
 								<input type="text" class="sign__input" name="username" placeholder="Email Or Username">
@@ -84,7 +81,6 @@
 
 							<span class="sign__text">Don't have an account? <a href="{%url 'accounts:sign_up'%}">Sign up!</a></span>
 
-							<span class="sign__text"><a href="{%url 'accounts:password_reset'%}">Forgot password?</a></span>
 						</form>
 						<!-- end authorization form -->
 					</div>
