@@ -58,7 +58,7 @@
 				</h6>
 					<div class="sign__content">
 						<!-- authorization form -->
-						<form action="{%url 'accounts:login' %}" method="post" class="sign__form">
+						<form action="{%url 'accounts:login' %}" method="post" style="direction: rtl;" class="sign__form">
 							{%csrf_token%}
 
 							<div class="sign__group">
@@ -71,15 +71,15 @@
 
 							<div class="sign__group sign__group--checkbox">
 								<input id="remember" name="remember" type="checkbox" checked="checked">
-								<label for="remember">Remember Me</label>
+								<label for="remember">مرا به خاطر بسپار</label>
 							</div>
 							
-							<button class="sign__btn" type="submit">Sign in</button>
+							<button class="sign__btn" type="submit">وارد شدن</button>
 
-							<span class="sign__delimiter">or</span>
+							<span class="sign__delimiter">یا</span>
 
 
-							<span class="sign__text">Don't have an account? <a href="{%url 'accounts:sign_up'%}">Sign up!</a></span>
+							<span class="sign__text"> آیا حساب کاربری ندارید؟ <a href="{%url 'accounts:sign_up'%}">ساخت حساب کاربری </a></span>
 
 						</form>
 						<!-- end authorization form -->

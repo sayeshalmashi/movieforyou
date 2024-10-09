@@ -15,6 +15,10 @@ def index_view(request):
 def about_view(request):
   return render(request,'website/about.html')
 
+def document_view(request):
+  return render(request,'website/document.html')
+
+
 
 def contact_view(request):
   if request.method == 'POST':

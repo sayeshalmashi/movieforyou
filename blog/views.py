@@ -122,7 +122,6 @@ def fetch_and_save_movies():
         page += 1
 
 
-
 def fetch_cast_and_crew(movie_id):
     url = f'{BASE_URL}/movie/{movie_id}/credits'
     params = {
@@ -142,7 +141,6 @@ def fetch_cast_and_crew(movie_id):
 
     return cast_data, crew_data
 
-
 def fetch_keywords(movie_id):
     # Define the endpoint for keywords
     url = f'{BASE_URL}/movie/{movie_id}/keywords'
@@ -159,9 +157,6 @@ def fetch_keywords(movie_id):
     # Get keywords from the response
     keywords = response.json().get('keywords', [])
     return keywords
-
-
-
 
 def fetch_trailer_url(movie_id):
     # Define the endpoint and parameters
@@ -240,7 +235,6 @@ def movies_view(request, **kwargs):
         'page_range': page_range,
     }
     return render(request, 'blog/movies.html', context)
-
 
 # Define details_view function
 def details_view(request, pid):

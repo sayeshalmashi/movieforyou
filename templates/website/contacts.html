@@ -3,18 +3,11 @@
 {%load compress%}
 {% block content %}
 	<!-- head -->
-	<section class="section section--head section--head-fixed">
+	<section class="section section--head section--head-fixed ta" style="direction: rtl;">
 		<div class="container">
 			<div class="row">
 				<div class="col-12 col-xl-6">
-					<h1 class="section__title section__title--head">Contacts</h1>
-				</div>
-
-				<div class="col-12 col-xl-6">
-					<ul class="breadcrumb">
-						<li class="breadcrumb__item"><a href="index.html">Home</a></li>
-						<li class="breadcrumb__item breadcrumb__item--active">Contacts</li>
-					</ul>
+					<h1 class="section__title section__title--head">تماس با ما</h1>
 				</div>
 			</div>
 		</div>
@@ -22,7 +15,7 @@
 	<!-- end head -->
 
 	<!-- contacts -->
-	<section class="section section--pb0">
+	<section class="section section--pb0 ta" style="direction: rtl;">
 		<div class="container">
 			<div class="row">
 				<div class="col-12 col-lg-7 col-xl-8">
@@ -31,40 +24,40 @@
 						<div class="row">
 							<div class="col-12 col-xl-6">
 								<div class="sign__group">
-									<input type="text" name="name" class="sign__input" placeholder="Name">
+									<input type="text" name="name" class="sign__input" placeholder="نام">
 								</div>
 							</div>
 
 							<div class="col-12 col-xl-6">
 								<div class="sign__group">
-									<input type="email" name="email" class="sign__input" placeholder="Email">
+									<input type="email" name="email" class="sign__input" placeholder="ایمیل">
 								</div>
 							</div>
 
 							<div class="col-12">
 								<div class="sign__group">
-									<input type="text" name="subject" class="sign__input" placeholder="Subject">
+									<input type="text" name="subject" class="sign__input" placeholder="موضوع">
 								</div>
 							</div>
 
 							<div class="col-12">
 								<div class="sign__group">
-									<textarea name="message" class="sign__textarea" placeholder="Type your message"></textarea>
+									<textarea name="message" class="sign__textarea" placeholder="پیام..."></textarea>
 								</div>
 							</div>
 
 							<div class="col-12 col-xl-3">
 								<div class="pb-7">{{form.captcha}}</div>
-								<button type="submit" class="sign__btn">Send</button>
+								<button type="submit" class="sign__btn">ارسال</button>
 							</div>
 						</div>
 					</form>	
 				</div>
 
 				<div class="col-12 col-lg-5 col-xl-4">
-					<h2 class="section__title section__title--sidebar">Info</h2>
+					<h2 class="section__title section__title--sidebar">اطلاعات ما</h2>
 					<ul class="contacts__list">
-						<li><a href="tel:+989356836432">+989356836432</a></li>
+						<li><a class="ta" href="tel:+989356836432">+989356836432</a></li>
 						<li><a href="sayeshalmashi50@gmail.com">sayeshalmashi50@gmail.com</a></li>
 					</ul>
 					<div class="contacts__social">

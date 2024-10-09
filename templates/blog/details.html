@@ -40,7 +40,7 @@
 
 </style>
 	<!-- details -->
-	<section class="section section--head section--head-fixed section--gradient section--details-bg">
+	<section class="section ta section--head section--head-fixed section--gradient section--details-bg" style="direction: rtl;">
 		<div class="section__bg" data-bg="https://image.tmdb.org/t/p/w500/{{ movie.poster_path  }}"></div>
 		<div class="container">
 			<!-- article -->
@@ -88,29 +88,9 @@
 								<track kind="captions" label="Français" srclang="fr" src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt">
 				
 								<!-- Fallback for browsers that don't support the <video> element -->
-								<a href="{{ movie.trailer_url }}" download>Download</a>
+								<a href="{{ movie.trailer_url }}" download>دانلود</a>
 						</video>
 				
-						<div class="article__actions article__actions--details">
-								<div class="article__download">
-										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-												<path d="M21,14a1,1,0,0,0-1,1v4a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V15a1,1,0,0,0-2,0v4a3,3,0,0,0,3,3H19a3,3,0,0,0,3-3V15A1,1,0,0,0,21,14Zm-9.71,1.71a1,1,0,0,0,.33.21.94.94,0,0,0,.76,0,1,1,0,0,0,.33-.21l4-4a1,1,0,0,0-1.42-1.42L13,12.59V3a1,1,0,0,0-2,0v9.59l-2.29-2.3a1,1,0,1,0-1.42,1.42Z"/>
-										</svg>
-										Download:
-										<a href="{{ movie.trailer_url }}" download="movie_trailer_480p.mp4">480p</a>
-										<a href="{{ movie.trailer_url }}" download="movie_trailer_720p.mp4">720p</a>
-										<a href="{{ movie.trailer_url }}" download="movie_trailer_1080p.mp4">1080p</a>
-										<a href="{{ movie.trailer_url }}" download="movie_trailer_4k.mp4">4k</a>
-								</div>
-				
-								<!-- add .active class when favorite -->
-								<button class="article__favorites" type="button">
-										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-												<path d="M16,2H8A3,3,0,0,0,5,5V21a1,1,0,0,0,.5.87,1,1,0,0,0,1,0L12,18.69l5.5,3.18A1,1,0,0,0,18,22a1,1,0,0,0,.5-.13A1,1,0,0,0,19,21V5A3,3,0,0,0,16,2Zm1,17.27-4.5-2.6a1,1,0,0,0-1,0L7,19.27V5A1,1,0,0,1,8,4h8a1,1,0,0,1,1,1Z"/>
-										</svg>
-										Add to favorites
-								</button>
-						</div>
 				</div>
 				
 					<!-- end video player -->
@@ -190,8 +170,8 @@
 					</div> -->
 					<!-- end series -->
 
-					<div class="col-12 col-xl-8 mt-5">
-						<h3 style="color: #ddd;">Rate This Movie</h3>
+					<div class="col-12 col-xl-8 mt-5 ta" style="direction: rtl;">
+						<h3 style="color: #ddd;">به این فیلم چه امتیازی میدهید؟</h3>
 						<form method="post" id="rating-form">
 							{% csrf_token %}
 							<div class="rating-options">
@@ -210,14 +190,14 @@
 									<input type="radio" id="rating-5" name="rating" value="5">
 									<label for="rating-5">5</label>
 							</div>
-							<button type="submit" name="" class="sign__btn">Submit Rating</button>
+							<button type="submit" name="" class="sign__btn">ثبت امتیاز</button>
 					  </form>
 						
 						<p id="user-rating-display" style="color: #ddd;">
 							{% if user_rating %}
-									Your current rating is: {{ user_rating.rating }}
+									امتیاز شما به این فیلم: {{ user_rating.rating }}
 							{% else %}
-									You haven't rated this movie yet.
+									امتیازی ثبت نکرده اید
 							{% endif %}
 					</p>
 						
@@ -225,15 +205,15 @@
 				
 				</div>
 
-				<div class="row">
+				<div class="row" style="direction: rtl;">
 					<div class="col-12 col-xl-8">
 						<!-- comments and reviews -->
-						<div class="comments">
+						<div class="comments ta">
 							<!-- tabs nav -->
 							<ul class="nav nav-tabs comments__title comments__title--tabs" id="comments__tabs" role="tablist">
 								<li class="nav-item">
 									<a class="nav-link active" data-toggle="tab" href="#tab-1" role="tab" aria-controls="tab-1" aria-selected="true">
-										<h4>Comments</h4>
+										<h4>نظرات</h4>
 									
 										<span>{{comments|length}}</span>
 									</a>
@@ -274,7 +254,7 @@
 										</li>
 										{% empty %}
 								     <div class="comment-form" style="color: aliceblue;">
-									     <h4>No comments here, be the first one to tell your thoughts!</h4>
+									     <h4>نظری ثبت نشده شما میتوانید اولین باشید</h4>
 							    	</div>
 										{%endfor%}
 										<!-- <li class="comments__item comments__item--answer">
@@ -343,30 +323,30 @@
 										<input type="hidden" name="movie" value="{{movie.id}}">
 										<div class="col-12 col-xl-6">
 											<div class="sign__group">
-												<input type="text" name="name" class="sign__input" placeholder="Name">
+												<input type="text" name="name" class="sign__input" placeholder="نام">
 											</div>
 										</div>
 			
 										<div class="col-12 col-xl-6">
 											<div class="sign__group">
-												<input type="email" name="email" class="sign__input" placeholder="Email">
+												<input type="email" name="email" class="sign__input" placeholder="ایمیل">
 											</div>
 										</div>
 										<div class="col-12 col-xl-6">
 											<div class="sign__group">
-												<input type="text" name="subject" class="sign__input" placeholder="subject">
+												<input type="text" name="موضوع" class="sign__input" placeholder="subject">
 											</div>
 										</div>
 			
 
 										<div class="col-12">
 											<div class="sign__group">
-												<textarea id="text" name="message" class="sign__textarea" placeholder="Add comment"></textarea>
+												<textarea id="text" name="message" class="sign__textarea" placeholder="نظر شما...."></textarea>
 											</div>
 										</div>
 									
 
-										<button type="submit" name="submit_comment" class="sign__btn">Send</button>
+										<button type="submit" name="submit_comment" class="sign__btn">ارسال</button>
 									</form>
 								</div>
 								<!-- end comments -->
@@ -386,12 +366,12 @@
 										<div class="subscribe__img">
 											<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.64,9.74l-.29,1.73A1.55,1.55,0,0,0,14,13a1.46,1.46,0,0,0,1.58.09L17,12.28l1.44.79A1.46,1.46,0,0,0,20,13a1.55,1.55,0,0,0,.63-1.51l-.29-1.73,1.2-1.22a1.54,1.54,0,0,0-.85-2.6l-1.62-.24-.73-1.55a1.5,1.5,0,0,0-2.72,0l-.73,1.55-1.62.24a1.54,1.54,0,0,0-.85,2.6Zm1.83-2.13a1.51,1.51,0,0,0,1.14-.85L17,5.93l.39.83a1.55,1.55,0,0,0,1.14.86l1,.14-.73.74a1.57,1.57,0,0,0-.42,1.34l.16,1-.79-.43a1.48,1.48,0,0,0-1.44,0l-.79.43.16-1a1.54,1.54,0,0,0-.42-1.33l-.73-.75ZM21,15.26a1,1,0,0,0-1,1v3a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V9.67l5.88,5.88a2.94,2.94,0,0,0,2.1.88l.27,0a1,1,0,0,0,.91-1.08,1,1,0,0,0-1.09-.91.94.94,0,0,1-.77-.28L5.41,8.26H9a1,1,0,0,0,0-2H5a3,3,0,0,0-3,3v10a3,3,0,0,0,3,3H19a3,3,0,0,0,3-3v-3A1,1,0,0,0,21,15.26Z"/></svg>
 										</div>
-										<h4 class="subscribe__title">Notifications</h4>
-										<p class="subscribe__text">Subscribe to notifications about new episodes</p>
+										<h4 class="subscribe__title">خبرنامه</h4>
+										<p class="subscribe__text">ما را در خبرنامه دنبال کنید و ار آخرین خبر ها مطلع شوید</p>
 										<div class="sign__group">
-											<input type="text" class="sign__input" placeholder="Email">
+											<input type="text" class="sign__input" placeholder="ایمیل">
 										</div>
-										<button type="button" class="sign__btn">Send</button>
+										<button type="button" class="sign__btn">ارسال</button>
 									</form>
 								</div>
 							</div>
@@ -485,8 +465,8 @@
 	<section class="section">
 		<div class="container">
 			<div class="row">
-				<div class="col-12">
-					<h2 class="section__title"><a href="category.html">Similar movies and TV series</a></h2>
+				<div class="col-12 ta">
+					<h2 class="section__title"><a href="category.html">فیلم و سریال مشابه</a></h2>
 				</div>
 
 				<div class="col-12">

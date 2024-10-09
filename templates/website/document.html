@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{%load static%}
+{%load compress%}
+{% block content %}
+	<!-- head -->
+	<section class="section section--head section--head-fixed section--gradient section--details">
+		<div class="container">
+			<!-- article -->
+			<section class="section section--head section--head-fixed" >
+				<div class="container">
+					<div class="row ta" style="justify-content: end;">
+						<div class="col-12 col-xl-6">
+							<h1 class="section__title section__title--head">راهنمای استفاده از سایت</h1>
+						</div>
+					</div>
+				</div>
+			</section>
+
+
+			<section class="section section--pb0" style="direction: rtl;">
+				<div class="container">
+					<div class="row ta" style="justify-content: end;">
+						<!-- section text -->
+						<div class="col-12 fss">
+							<div class="col-12 col-xl-6">
+								<h3 class="section__title section__title--head" style="font-size: xx-large;"> معرفی</h3>
+							</div>
+							<p class="section__text fss">به سایت پیشنهاد فیلم خوش آمدید! اینجا شما می‌توانید به راحتی فیلم‌های مورد علاقه خود را پیدا کنید، آن‌ها را یررسی کنید و حتی با دادن امتیاز، فیلم‌های مشابه و مورد علاقه‌تان را کشف کنید. بریم ببینیم این سایت چطور کار می‌کنه.</p>
+
+							<div class="col-12 col-xl-6 mt-5">
+								<h3 class="section__title section__title--head" style="font-size: xx-large;"> ثبت‌نام و ورود به حساب کاربری</h3>
+							</div>
+							<p class="section__text fss">ابتدا اگر حساب کاربری ندارید، باید یک حساب جدید بسازید. برای این کار:</p>
+							<ul style="list-style: decimal !important;">
+								<li class="section__text fss">
+									به صفحه ثبت‌نام بروید و اطلاعات خودتان را وارد کنید.
+									<img style="width: 30%;" src="{% static 'img/document/sign-in.png' %}" alt="">
+								</li>
+								<li class="section__text fss">
+									اگر قبلاً ثبت‌نام کرده‌اید، به سادگی از طریق صفحه ورود به حساب کاربری خود وارد شوید.
+									<img style="width: 30%;" src="{% static 'img/document/sign-up.png' %}" alt="">
+								</li>
+							</ul>
+							<p class="section__text fss"><b>توجه</b>: حتی اگر وارد سایت نشده‌اید، همچنان می‌توانید فیلم‌ها را مشاهده کنید، اما برای ثبت امتیاز و دریافت پیشنهادهای شخصی‌سازی‌شده، باید وارد حساب خود شوید.
+							</p>
+							<div class="col-12 col-xl-6 mt-5">
+								<h3 class="section__title section__title--head" style="font-size: xx-large;"> پروفایل و پیشنهادهای ویژه</h3>
+							</div>
+							<p class="section__text fss">پس از ورود به حساب کاربری، وارد پروفایل خود می‌شوید. در اینجا چند قابلیت جذاب داریم:
+							</p>
+							<ul style="list-style: decimal !important;">
+								<li class="section__text fss">
+									  <b>امتیازدهی به فیلم ها</b>: هر فیلمی که تماشا می‌کنید، می‌توانید به آن امتیاز ۱ تا ۵ ستاره بدهید و در بخش پروفایل مشاهده کنید.
+										<br/>
+									<img style="width: 30%;" src="{% static 'img/document/rate.png' %}" alt="">
+								</li>
+								<li class="section__text fss">براساس امتیازهایی که داده‌اید، سیستم هوشمند سایت به شما ۵ فیلم پیشنهاد می‌دهد. این فیلم‌ها دقیقاً بر اساس سلیقه شما انتخاب می‌شوند، پس حسابی جالب و کاربردی‌اند.
+								<img style="width: 30%;" src="{% static 'img/document/movie-for.png' %}" alt="">
+							</li>
+							</ul>
+
+						</div>
+						<!-- end section text -->
+					</div>
+				</div>
+			</section>
+			<!-- end article -->
+		</div>
+	</section>
+	<!-- end head -->
+{%endblock%}
