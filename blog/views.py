@@ -206,11 +206,38 @@ def fetch_genre_by_id(genre_id):
 def movies_view(request, **kwargs):
     current_time = timezone.now()
     movies = Movie.objects.filter(status=True, release_date__lte=current_time).order_by('-movie_id')
-    
+
+    translations = {
+        'Action': 'اکشن',
+        'Drama': 'درام',
+        'Comedy': 'کمدی',
+        'Adventure' : 'ماجراجویی',
+        'Fantasy' : 'فانتزی',
+        'Animation' :'انیمیشن',
+        'Horror' : ' ترسناک',
+        'History' : 'تاریخی',
+        'Western' : 'سینمای غرب',
+        'Thriller' : 'رمزآلود',
+        'Crime' : 'جنایی' ,
+        'Documentary' : 'مستند' ,
+        'Science Fiction' : 'علمی تخیلی' ,
+        'Mystery' : 'معمایی' ,
+        'Music' : 'موزیکال' ,
+        'Romance' : 'رمانتیک' ,
+        'Family' : 'خانوادگی' ,
+        'War' : 'جنگی' ,
+        'TV Movie' : 'پخش خانگی',
+    }
+
     # Filter movies by category name
     if 'cat_name' in kwargs:
         movies = movies.filter(genres__name__iexact=kwargs['cat_name'])
-    categories=Category.objects.annotate(movie_count=Count('movies')).filter(movie_count__gt=0)
+    
+    categories = Category.objects.annotate(movie_count=Count('movies')).filter(movie_count__gt=0)
+
+    for category in categories:
+        category.translated_name = translations.get(category.name, category.name)
+
     # Pagination
     paginator = Paginator(movies, 12)
     page_number = request.GET.get('page')
@@ -220,7 +247,8 @@ def movies_view(request, **kwargs):
         movies = paginator.get_page(1)
     except EmptyPage:
         movies = paginator.get_page(paginator.num_pages)
-# Custom pagination logic for displaying 5-page ranges
+
+    # Custom pagination logic for displaying 5-page ranges
     def get_page_range(current_page, total_pages, max_range=5):
         start = max(current_page - max_range // 2, 1)
         end = min(start + max_range - 1, total_pages)
@@ -239,7 +267,30 @@ def movies_view(request, **kwargs):
 # Define details_view function
 def details_view(request, pid):
     movie = get_object_or_404(Movie, pk=pid, status=True)
+    translations = {
+        'Action': 'اکشن',
+        'Drama': 'درام',
+        'Comedy': 'کمدی',
+        'Adventure' : 'ماجراجویی',
+        'Fantasy' : 'فانتزی',
+        'Animation' :'انیمیشن',
+        'Horror' : ' ترسناک',
+        'History' : 'تاریخی',
+        'Western' : 'سینمای غرب',
+        'Thriller' : 'رمزآلود',
+        'Crime' : 'جنایی' ,
+        'Documentary' : 'مستند' ,
+        'Science Fiction' : 'علمی تخیلی' ,
+        'Mystery' : 'معمایی' ,
+        'Music' : 'موزیکال' ,
+        'Romance' : 'رمانتیک' ,
+        'Family' : 'خانوادگی' ,
+        'War' : 'جنگی' ,
+        'TV Movie' : 'پخش خانگی',
+    }
     categories = movie.genres.all()
+    for category in categories:
+        category.translated_name = translations.get(category.name, category.name)
     similar_movies = Movie.objects.filter(genres__in=categories).exclude(id=movie.id).distinct()[:10]
     comments = Comment.objects.filter(movie=movie, approved=True)
     form = CommentForm()

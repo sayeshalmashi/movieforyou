@@ -34,15 +34,51 @@
 							<ul style="list-style: decimal !important;">
 								<li class="section__text fss">
 									به صفحه ثبت‌نام بروید و اطلاعات خودتان را وارد کنید.
-									<img style="width: 30%;" src="{% static 'img/document/sign-in.png' %}" alt="">
+									<img style="width: 30%; display: block;" src="{% static 'img/document/sign-in.png' %}" alt="">
 								</li>
 								<li class="section__text fss">
 									اگر قبلاً ثبت‌نام کرده‌اید، به سادگی از طریق صفحه ورود به حساب کاربری خود وارد شوید.
-									<img style="width: 30%;" src="{% static 'img/document/sign-up.png' %}" alt="">
+									<img style="width: 30%; display: block;" src="{% static 'img/document/sign-up.png' %}" alt="">
 								</li>
 							</ul>
 							<p class="section__text fss"><b>توجه</b>: حتی اگر وارد سایت نشده‌اید، همچنان می‌توانید فیلم‌ها را مشاهده کنید، اما برای ثبت امتیاز و دریافت پیشنهادهای شخصی‌سازی‌شده، باید وارد حساب خود شوید.
 							</p>
+							<div class="col-12 col-xl-6 mt-5">
+								<h3 class="section__title section__title--head" style="font-size: xx-large;"> تماشای امتیازات و نظرات فیلم‌ها و جستجو در سایت </h3>
+							</div>
+							<p class="section__text fss">در سایت شما می‌توانید:
+							</p>
+							<ul style="list-style: decimal !important;">
+								<li class="section__text fss mb-4">
+									  <b> فیلم‌ها را بر اساس ژانر جستجو کنید.</b>:به صفحه اصلی که بروید، منویی از ژانرها (مانند اکشن، کمدی، درام و ...) وجود دارد. با انتخاب هر ژانر، لیستی از فیلم‌های مربوط به آن دسته به شما نمایش داده می شود همچنین تعداد فیلم هایی که از هر ژانر موجو است را هم میتوانید ببینید..
+										<br/>
+									<img class="mb-4" style="width: 30%; display: block;" src="{% static 'img/document/genre.png' %}" alt="">
+								</li>
+								<li class="section__text fss mb-3"><b>جستجو بر اساس عنوان: </b> <br/>اگر دنبال یک فیلم خاص هستید، کافی است از نوار جستجو استفاده کنید و عنوان فیلم را وارد کنید. ما آن را برای شما پیدا می‌کنیم!
+								<img class="m-4" style="width: 30%; display: block;" src="{% static 'img/document/search.png' %}" alt="">
+							</li>
+							</ul>
+
+							<div class="col-12 col-xl-6 mt-5">
+								<h3 class="section__title section__title--head" style="font-size: xx-large;"> صفحه هر فیلم </h3>
+							</div>
+							<p class="section__text fss">وقتی روی یک فیلم کلیک کنید، به صفحه جزئیات آن فیلم منتقل می‌شوید. در این صفحه:
+							</p>
+							<ul style="list-style: decimal !important;">
+								<li class="section__text fss mb-4">توضیحات کامل فیلم، بازیگران، تاریخ اکران و دیگر جزئیات را مشاهده می‌کنید.
+								</li>
+								<li class="section__text fss mb-3">اگر لاگین باشید، می‌توانید امتیاز خود را به فیلم اضافه کنید و نظرات کاربران دیگر را بخوانید یا حتی نظر خودتان را بنویسید.
+								<img class="m-4" style="width: 30%; display: block;" src="{% static 'img/document/movie-rate.png' %}" alt="">
+								<img class="m-4" style="width: 30%; display: block;" src="{% static 'img/document/comment.png' %}" alt="">
+							</li>
+							<li class="section__text fss mb-3">فیلم‌های مشابه: پایین هر صفحه فیلم، ۱۰ فیلم مشابه با همان ژانر به شما پیشنهاد می‌شود تا گزینه‌های بیشتری برای تماشا داشته باشید.
+								<img class="m-4" style="width: 30%; display: block;" src="{% static 'img/document/similar.png' %}" alt="">
+							</li>
+							</ul>
+
+							
+
+
 							<div class="col-12 col-xl-6 mt-5">
 								<h3 class="section__title section__title--head" style="font-size: xx-large;"> پروفایل و پیشنهادهای ویژه</h3>
 							</div>
@@ -50,14 +86,20 @@
 							</p>
 							<ul style="list-style: decimal !important;">
 								<li class="section__text fss">
-									  <b>امتیازدهی به فیلم ها</b>: هر فیلمی که تماشا می‌کنید، می‌توانید به آن امتیاز ۱ تا ۵ ستاره بدهید و در بخش پروفایل مشاهده کنید.
+									  <b>مشاهده امتیازهای خود به فیلم ها</b>: <br/>در این قسمت میتوانید امتیازهایی که به فیلم ها داده اید را مشاهده کنید.
 										<br/>
-									<img style="width: 30%;" src="{% static 'img/document/rate.png' %}" alt="">
+									<img class="mb-4" style="width: 30%; display: block;" src="{% static 'img/document/rate.png' %}" alt="">
 								</li>
-								<li class="section__text fss">براساس امتیازهایی که داده‌اید، سیستم هوشمند سایت به شما ۵ فیلم پیشنهاد می‌دهد. این فیلم‌ها دقیقاً بر اساس سلیقه شما انتخاب می‌شوند، پس حسابی جالب و کاربردی‌اند.
-								<img style="width: 30%;" src="{% static 'img/document/movie-for.png' %}" alt="">
+								<li class="section__text fss mb-3">براساس امتیازهایی که داده‌اید، سیستم هوشمند سایت به شما ۵ فیلم پیشنهاد می‌دهد. این فیلم‌ها دقیقاً بر اساس سلیقه شما انتخاب می‌شوند، پس حسابی جالب و کاربردی‌اند.
+								<img style="width: 30%; display: block;" src="{% static 'img/document/movie-for.png' %}" alt="">
 							</li>
 							</ul>
+
+							<div class="col-12 col-xl-6 mt-5">
+								<h3 class="section__title section__title--head" style="font-size: xx-large;"> ارتباط با ما </h3>
+							</div>
+							<p class="section__text fss"> همچنین اگر سوال یا پیشنهادی داشتید، از طریق صفحه تماس با ما فرم تماس را پر کنید و ما با شما در تماس خواهیم بود.
+							</p>
 
 						</div>
 						<!-- end section text -->
