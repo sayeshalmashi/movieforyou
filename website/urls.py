@@ -10,4 +10,5 @@ urlpatterns = [
   path('error',error_view, name='error'),
   path('interview',interview_view, name='interview'),
   path('profile',profile_view, name='profile'),
+  path('document',document_view, name='document'),
 ]
