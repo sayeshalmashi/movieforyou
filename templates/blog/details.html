@@ -494,12 +494,11 @@
 				const ratingForm = document.getElementById('rating-form');
 		
 				ratingForm.addEventListener('submit', function(event) {
-						event.preventDefault(); // جلوگیری از ارسال فرم به روش سنتی
+						event.preventDefault(); 
 		
-						const formData = new FormData(ratingForm); // جمع‌آوری اطلاعات فرم
+						const formData = new FormData(ratingForm);
 						const csrfToken = formData.get('csrfmiddlewaretoken');
 		
-						// ارسال درخواست AJAX به همان ویوی details_view
 						fetch(window.location.href, {
 								method: 'POST',
 								headers: {
@@ -511,11 +510,11 @@
 						.then(response => response.json())
 						.then(data => {
 								if (data.success) {
-										// به‌روزرسانی بخش نمایش امتیاز
+
 										const ratingDisplay = document.getElementById('user-rating-display');
-										ratingDisplay.textContent = `Your current rating: ${data.rating} stars`;
+										ratingDisplay.textContent = `امتیاز شما ${data.rating}`;
 								} else {
-										alert(data.message); // نمایش خطا در صورت وجود مشکل
+										alert(data.message);
 								}
 						})
 						.catch(error => {

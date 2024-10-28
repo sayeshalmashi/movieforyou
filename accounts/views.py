@@ -32,10 +32,10 @@ def login_view(request):
 
             if user is not None:
                 auth.login(request, user)
-                messages.add_message(request,messages.SUCCESS,'Login was successful')
+                messages.add_message(request,messages.SUCCESS,'با موفقیت وارد شدید')
                 return redirect('/')
             else:
-                 messages.add_message(request,messages.ERROR,'The desired person was not found')
+                 messages.add_message(request,messages.ERROR,'کاربر یافت نشد')
         return render(request, "registration/login.html")
     else:
           return redirect('/')

@@ -314,7 +314,7 @@ def details_view(request, pid):
                             user=request.user,
                             defaults={'rating': rating_value}
                         )
-                        messages.success(request, f'Your rating of {rating_value} stars was submitted successfully.')
+                        messages.success(request, f'امتیاز {rating_value}با موفقیت ثبت شد')
                         return JsonResponse({
                             'success': True,
                             'rating': rating_obj.rating
@@ -337,9 +337,9 @@ def details_view(request, pid):
                     comment.movie = movie
                     comment.user = request.user
                     comment.save()
-                    messages.success(request, "Your comment was submitted successfully.")
+                    messages.success(request, "نظر شما با موفقیت ثبت شد")
                 else:
-                    messages.error(request, "There was an error submitting your comment.")
+                    messages.error(request, "مشکلی در ثبت نظر شما وجود دارد")
 
         context = {
             'movie': movie,

@@ -127,13 +127,13 @@ body {
 	</header>
 	{% if messages %}
 	{% for message in messages %}
-		<div style="color: white; margin: 50px; background-color: #2B74D5; padding: 20px; border-radius: 5px;" class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+		<div style="color: white; margin: 50px; background-color: #2B74D5; padding: 20px; border-radius: 5px;" class="alert ta {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
 	{% endfor %}
 {% endif %}
 
 {% if form.errors %}
 	<div  class="alert alert-error">
-		<h4>Please fix the following errors</h4>
+		<h4 class="text__section">موارد زیر را برطرف کنید</h4>
 		<ul >
 			{% for field in form %}
 				{% if field.errors %}
